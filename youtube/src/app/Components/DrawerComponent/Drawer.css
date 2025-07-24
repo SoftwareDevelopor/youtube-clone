@@ -1,0 +1,11 @@
+.drawernav::-webkit-scrollbar{
+    width: 8px;
+    background: rgb(20, 20, 20);
+}
+.drawernav::-webkit-scrollbar-track{
+    background: black;
+}
+.drawernav::-webkit-scrollbar-thumb{
+    background: rgb(84, 84, 84);
+    border-radius: 20px;
+}

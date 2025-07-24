@@ -1,0 +1,16 @@
+.slick-prev:before, .slick-next:before {
+    width: 100% !important;
+    font-size: 40px !important;
+    
+}
+.slick-prev:before{
+    display: none !important;
+}
+.slick-prev{
+    left: -18px !important;
+    
+}
+.slick-next{
+    right: 3px !important;
+    top: 18px !important;
+}
