@@ -1,6 +1,6 @@
 import axios from "axios";
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000"
-  // "https://yourtube-clone-1.vercel.app/"
+  baseURL: "https://youtube-clone-1-7t1w.onrender.com"
+  
 });
 export default axiosInstance;
