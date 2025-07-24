@@ -12,7 +12,7 @@ const path = require("path");
 const userrouter = require("./routes/UserRoute");
 const socketio = require("socket.io");
 
-const Recording = require("./Models/recording.js"); // Fixed casing to match file system
+const Recording = require("./Models/Recording.js"); // Fixed casing to match file system
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, "uploads");
