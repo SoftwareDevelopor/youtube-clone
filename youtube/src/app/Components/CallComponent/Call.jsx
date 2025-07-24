@@ -8,7 +8,7 @@ import io from 'socket.io-client';
 
 
 
-const socket = io('http://localhost:5000'); 
+const socket = io('https://youtube-clone-1-7t1w.onrender.com'); 
 
 
 
