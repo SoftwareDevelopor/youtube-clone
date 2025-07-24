@@ -28,7 +28,7 @@ const server = http.createServer(app);
 
 const io = socketio(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://youtube-clone-one-dun.vercel.app/",
     method: ["GET", "POST"],
   },
 });
@@ -36,11 +36,11 @@ const io = socketio(server, {
 app.use(cors());
 
 io.on("Connection", (socket) => {
-  console.log(socket);
-  console.log("A user is connected", socket.id);
+  
+  
   socket.on("join-room", (roomId, userId) => {
     socket.join(roomId);
-    console.log(`User ${userId} joined room ${roomId}`);
+    
     socket.to(roomId).emit("user-connected", userId); // Notify others in the room
   });
 
@@ -63,7 +63,7 @@ io.on("Connection", (socket) => {
   let currentRecording = null; // To store recording object
 
   socket.on("start-recording", async (roomId) => {
-    console.log(`Recording started in room: ${roomId}`);
+    
     io.to(roomId).emit("recording-status", "started");
 
     // Create a new recording entry in DB
@@ -74,14 +74,14 @@ io.on("Connection", (socket) => {
         startTime: new Date(),
       });
       await currentRecording.save();
-      console.log("Recording entry created in DB:", currentRecording._id);
+      
     } catch (err) {
       console.error("Error saving recording start to DB:", err);
     }
   });
 
   socket.on("stop-recording", async (roomId) => {
-    console.log(`Recording stopped in room: ${roomId}`);
+    
     io.to(roomId).emit("recording-status", "stopped");
 
     if (currentRecording) {
@@ -90,7 +90,7 @@ io.on("Connection", (socket) => {
         // In a real app, you'd save the actual video file on the server
         // and store its path here. For now, just marking end time.
         await currentRecording.save();
-        console.log("Recording entry updated in DB:", currentRecording._id);
+        
       } catch (err) {
         console.error("Error saving recording stop to DB:", err);
       } finally {
@@ -100,7 +100,7 @@ io.on("Connection", (socket) => {
   });
 
   socket.on("Disconnect", () => {
-    console.log("User Connected", socket.id);
+    
     socket.broadcast.emit("User connected", socket.id);
   });
 });
@@ -125,9 +125,6 @@ app.use(bodyparser.json());
 app.use("/video", videoroute);
 app.use("/api/user", userrouter);
 
-server.listen(5000, () => {
-  console.log("Server is Working Fine !");
-});
 
 const dburl = process.env.DB_URL;
 
