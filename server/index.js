@@ -125,6 +125,9 @@ app.use(bodyparser.json());
 app.use("/video", videoroute);
 app.use("/api/user", userrouter);
 
+server.listen(5000,()=>{
+  console.log('Connected !')
+})
 
 const dburl = process.env.DB_URL;
 
