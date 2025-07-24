@@ -3,43 +3,49 @@ import React, { createContext, useEffect, useState } from "react";
 
 export let MainContextProvider = createContext();
 export default function MainContext({ children }) {
-
-  
-
   // Downloads state
-  let [downloads, setDownloads] = useState(
-    localStorage.getItem("DOWNLOADS")
-      ? JSON.parse(localStorage.getItem("DOWNLOADS"))
-      : []
-  );
+  let [downloads, setDownloads] = useState([]);
+  let [token, settoken] = useState("");
+  let [user, setuser] = useState(null);
+  let [isSubscribed, setisSubscribed] = useState(false);
+
+  // Load from localStorage on mount (client-side only)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedDownloads = localStorage.getItem("DOWNLOADS");
+      if (storedDownloads) setDownloads(JSON.parse(storedDownloads));
+      const storedToken = localStorage.getItem("TOKEN");
+      if (storedToken) settoken(storedToken);
+      const storedUser = localStorage.getItem("USER");
+      if (storedUser) setuser(JSON.parse(storedUser));
+      const storedSub = localStorage.getItem("Subscription");
+      if (storedSub) setisSubscribed(storedSub === "true" || storedSub === true);
+    }
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem("DOWNLOADS", JSON.stringify(downloads));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("DOWNLOADS", JSON.stringify(downloads));
+    }
   }, [downloads]);
 
-  let [token, settoken] = useState(localStorage.getItem("TOKEN") ?? "");
-  let [user, setuser] = useState(
-    localStorage.getItem("USER")
-      ? JSON.parse(localStorage.getItem("USER"))
-      : null
-  );
-
   useEffect(() => {
-    localStorage.setItem("USER", JSON.stringify(user));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("USER", JSON.stringify(user));
+    }
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem("TOKEN", token);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("TOKEN", token);
+    }
   }, [token]);
 
-  let [isSubscribed, setisSubscribed] = useState(
-    localStorage.getItem("Subscription") ?? false
-  );
   useEffect(() => {
-    localStorage.setItem("Subscription", isSubscribed);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("Subscription", isSubscribed);
+    }
   }, [isSubscribed]);
-
-  
 
   let obj = {
     user,
