@@ -61,7 +61,7 @@ export default function UploadVideo() {
     }
 
     const formData = new FormData();
-    formData.append('video', videoFile);
+    formData.append('filepath', videoFile);
     formData.append('thumbnail', thumbnailFile);
     formData.append('videotitle', title);
     formData.append('description', description);
@@ -70,7 +70,22 @@ export default function UploadVideo() {
     // formData.append('channelLogo', user?.photoURL || '');
 
     try {
-      const res=await axiosInstance.post("/video/upload",formData)
+      await fetch('https://youtube-clone-oprs.onrender.com/video/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Upload successful:', data);
+      })
+      .catch(error => {
+        console.error('Upload failed:', error);
+      });
       toast.success("Upload Successfully !")
       resetform()
     } catch (err) {
@@ -104,7 +119,7 @@ export default function UploadVideo() {
           <div className='mb-2'>
             <video width="320" height="180" controls>
               <source src={preview} type={videoFile ? videoFile.type : ''} />
-              Your browser does not support the video tag.
+              
             </video>
           </div>
         )}
