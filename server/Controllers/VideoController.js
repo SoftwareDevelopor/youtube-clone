@@ -5,32 +5,40 @@ const fs = require('fs');
 const axios = require('axios');
 
 exports.uploadvideo = async (req, res) => {
+  console.log('Incoming upload request');
+  console.log('req.files:', req.files);
+  console.log('req.body:', req.body);
   if (!req.files || !req.files["video"] || !req.files["thumbnail"]) {
-    return res.status(404).json({ message: "Upload a video and a thumbnail" });
-  } else {
-    try {
-      const videoFile = req.files["video"][0];
-      const thumbnailFile = req.files["thumbnail"][0];
-      const file = new Video({
-        videotitle: req.body.videotitle,
-        filename: videoFile.originalname,
-        filepath: videoFile.path,
-        filetype: videoFile.mimetype,
-        filesize: videoFile.size,
-        videochannel: req.body.videochannel,
-        uploader: req.body.uploader,
-        description: req.body.description,
-        thumbnail: thumbnailFile ? thumbnailFile.path : "",
-        like: 0,
-        views: 0,
-        _id: new mongoose.Types.ObjectId(req.body.id)
-      });
-      await file.save();
-      return res.status(201).json("file uploaded");
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: "Something Went Wrong !" });
-    }
+    return res.status(404).json({ message: "Upload a video and a thumbnail", files: req.files, body: req.body });
+  }
+  // Check for required text fields
+  const requiredFields = ["videotitle", "videochannel", "uploader", "description", "id"];
+  const missingFields = requiredFields.filter(f => !req.body[f]);
+  if (missingFields.length > 0) {
+    return res.status(400).json({ message: `Missing required fields: ${missingFields.join(", ")}` });
+  }
+  try {
+    const videoFile = req.files["video"][0];
+    const thumbnailFile = req.files["thumbnail"][0];
+    const file = new Video({
+      videotitle: req.body.videotitle,
+      filename: videoFile.originalname,
+      filepath: videoFile.path,
+      filetype: videoFile.mimetype,
+      filesize: videoFile.size,
+      videochannel: req.body.videochannel,
+      uploader: req.body.uploader,
+      description: req.body.description,
+      thumbnail: thumbnailFile ? thumbnailFile.path : "",
+      like: 0,
+      views: 0,
+      _id: new mongoose.Types.ObjectId(req.body.id)
+    });
+    await file.save();
+    return res.status(201).json("file uploaded");
+  } catch (error) {
+    console.log('Upload error:', error);
+    return res.status(500).json({ message: "Something Went Wrong !", error: error.message });
   }
 };
 
