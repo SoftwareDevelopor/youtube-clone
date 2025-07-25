@@ -35,7 +35,7 @@ const io = socketio(server, {
 
 
 app.use(cors({
-  origin: 'https://youtube-clone-one-dun.vercel.app',
+  origin: 'https://youtube-clone-one-dun.vercel.app/',
 }));
 
 io.on("Connection", (socket) => {
