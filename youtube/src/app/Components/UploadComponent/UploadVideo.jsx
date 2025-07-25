@@ -61,7 +61,7 @@ export default function UploadVideo() {
     }
 
     const formData = new FormData();
-    formData.append('filepath', videoFile);
+    formData.append('video', videoFile);
     formData.append('thumbnail', thumbnailFile);
     formData.append('videotitle', title);
     formData.append('description', description);

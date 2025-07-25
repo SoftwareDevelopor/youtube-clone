@@ -14,11 +14,7 @@ const socketio = require("socket.io");
 
 const Recording = require("./Models/Recording.js"); // Fixed casing to match file system
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
-}
+
 
 dotenv.config();
 
@@ -127,9 +123,8 @@ app.use("/video", videoroute);
 app.use("/api/user", userrouter);
 
 server.listen(5000,()=>{
-  console.log('Connected !')
+  console.log('Server is running !')
 })
-
 const dburl = process.env.DB_URL;
 
 mongoose

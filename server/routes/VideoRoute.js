@@ -4,10 +4,7 @@ const { upload } = require("../videofile/videofile");
 
 const videoroute=express.Router();
 
-videoroute.post("/upload", upload.fields([
-  { name: "video", maxCount: 1 },
-  { name: "thumbnail", maxCount: 1 }
-]), uploadvideo);
+videoroute.post("/upload", upload.single("file"), uploadvideo);
 
 videoroute.get("/getallvideos",getAllVideo)
 
