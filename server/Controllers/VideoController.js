@@ -5,35 +5,21 @@ const fs = require("fs");
 const axios = require("axios");
 
 exports.uploadvideo = async (req, res) => {
-  console.log("Incoming upload request");
-  if (!req.files || !req.files["video"] || !req.files["thumbnail"]) {
-    return res
-      .status(404)
-      .json({
-        message: "Upload a video and a thumbnail",
-        files: req.files,
-        body: req.body,
-      });
+  console.log('Incoming upload request');
+  console.log('req.files:', req.files);
+  console.log('req.body:', req.body);
+  if (!req.files || !req.files["video"]) {
+    return res.status(404).json({ message: "Upload a video file (field name: 'video')", files: req.files, body: req.body });
   }
   // Check for required text fields
-  const requiredFields = [
-    "videotitle",
-    "videochannel",
-    "uploader",
-    "description",
-    "id",
-  ];
-  const missingFields = requiredFields.filter((f) => !req.body[f]);
+  const requiredFields = ["videotitle", "videochannel", "uploader", "description", "id"];
+  const missingFields = requiredFields.filter(f => !req.body[f]);
   if (missingFields.length > 0) {
-    return res
-      .status(400)
-      .json({
-        message: `Missing required fields: ${missingFields.join(", ")}`,
-      });
+    return res.status(400).json({ message: `Missing required fields: ${missingFields.join(", ")}` });
   }
   try {
     const videoFile = req.files["video"][0];
-    const thumbnailFile = req.files["thumbnail"][0];
+    const thumbnailFile = req.files["thumbnail"] ? req.files["thumbnail"][0] : null;
     const file = new Video({
       videotitle: req.body.videotitle,
       filename: videoFile.originalname,
@@ -46,18 +32,13 @@ exports.uploadvideo = async (req, res) => {
       thumbnail: thumbnailFile ? thumbnailFile.path : "",
       like: 0,
       views: 0,
-      _id: new mongoose.Types.ObjectId(req.body.id),
+      _id: new mongoose.Types.ObjectId(req.body.id)
     });
     await file.save();
-
-    console.log("req.files:", req.files);
-    console.log("req.body:", req.body);
     return res.status(201).json("file uploaded");
   } catch (error) {
-    console.log("Upload error:", error);
-    return res
-      .status(500)
-      .json({ message: "Something Went Wrong !", error: error.message });
+    console.log('Upload error:', error);
+    return res.status(500).json({ message: "Something Went Wrong !", error: error.message });
   }
 };
 

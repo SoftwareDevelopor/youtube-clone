@@ -28,14 +28,17 @@ const server = http.createServer(app);
 
 const io = socketio(server, {
   cors: {
-    origin: "https://youtube-clone-one-dun.vercel.app/",
+    origin: "https://youtube-clone-one-dun.vercel.app",
     method: ["GET", "POST"],
   },
 });
 
 
 app.use(cors({
-  origin: 'https://youtube-clone-one-dun.vercel.app/',
+  origin: 'https://youtube-clone-one-dun.vercel.app',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 io.on("Connection", (socket) => {
@@ -127,7 +130,7 @@ server.listen(5000,()=>{
   console.log('Connected !')
 })
 
-const dburl = process.env.DB_URL || 'mongodb+srv://saurabh123:saurabhkumar124@@cluster0.idzl30m.mongodb.net/';
+const dburl = process.env.DB_URL;
 
 mongoose
   .connect(dburl)
