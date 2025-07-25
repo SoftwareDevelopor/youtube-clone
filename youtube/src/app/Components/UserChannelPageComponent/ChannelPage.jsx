@@ -15,7 +15,7 @@ export default function ChannelPage() {
   const fetchPoints = async () => {
     if (user && user.displayName && user.email) {
       try {
-        const response = await fetch("https://youtube-clone-1-7t1w.onrender.com/api/user/addPoints", {
+        const response = await fetch("https://youtube-clone-oprs.onrender.com/api/user/addPoints", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

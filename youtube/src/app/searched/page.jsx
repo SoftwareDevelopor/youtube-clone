@@ -42,7 +42,7 @@ export default function Searched() {
               <Link href={`/videopage/${v.id}`}>
                 <img
                   className="rounded-lg w-full"
-                  src={`https://youtube-clone-1-7t1w.onrender.com/${v.thumbnail
+                  src={`https://youtube-clone-oprs.onrender.com/${v.thumbnail
                     .replace(/\\/g, "/")
                     .replace(/\//g, "/")}`}
                   alt={v.videotitle}

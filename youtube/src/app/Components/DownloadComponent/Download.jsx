@@ -17,7 +17,7 @@ export default function DownloadSection() {
           {downloads.map((v, i) => (
             <div key={i} className="grid grid-cols-[40%_auto] gap-5 relative group hover:bg-gray-800 p-3 rounded-xl">
               <img
-                src={`https://youtube-clone-1-7t1w.onrender.com/${v.thumbnail.replace(/\\/g, "/")}`}
+                src={`https://youtube-clone-oprs.onrender.com/${v.thumbnail.replace(/\\/g, "/")}`}
                 alt=""
                 width={"100%"}
                 className="rounded-xl"

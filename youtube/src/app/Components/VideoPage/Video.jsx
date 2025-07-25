@@ -190,7 +190,7 @@ export default function Video() {
               >
                 {/* controlsList="nodownload" :- this will remove or hide the download button in controls */}
                 <source
-                  src={`https://youtube-clone-1-7t1w.onrender.com/${singledata.filepath.replace(
+                  src={`https://youtube-clone-oprs.onrender.com/${singledata.filepath.replace(
                     /\\/g,
                     "/"
                   )}`}
