@@ -6,15 +6,15 @@ const axios = require("axios");
 
 exports.uploadvideo = async (req, res) => {
   console.log('Incoming upload request');
-  console.log('req.files:', req.files.video);
-  console.log('req.body:', req.body);
-  if (!req.files || !req.files["video"]) {
-    return res.status(404).json({ message: "Upload a video file (field name: 'video')", files: req.files, body: req.body });
+  
+  
+  if (!req.files || !req.body) {
+    return res.status(404).json({ message: "Upload them", files: req.files, body: req.body });
   }
   
   try {
-    const videoFile = req.files["video"][0];
-    const thumbnailFile = req.files["thumbnail"] ? req.files["thumbnail"][0] : null;
+    const videoFile = req.files.video[0];
+    const thumbnailFile = req.files.thumbnail[0];
     const file = new Video({
       videotitle: req.body.videotitle,
       filename: videoFile.originalname,
@@ -24,7 +24,7 @@ exports.uploadvideo = async (req, res) => {
       videochannel: req.body.videochannel,
       uploader: req.body.uploader,
       description: req.body.description,
-      thumbnail: thumbnailFile ? thumbnailFile.path : "",
+      thumbnail: thumbnailFile.path,
       like: 0,
       views: 0,
       _id: new mongoose.Types.ObjectId(req.body.id)
