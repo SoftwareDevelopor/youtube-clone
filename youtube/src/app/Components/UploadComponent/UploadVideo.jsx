@@ -55,18 +55,20 @@ export default function UploadVideo() {
   const handleUpload = async (e) => {
     e.preventDefault();
 
-    if (!videoFile || !thumbnailFile) {
-      toast.error('Please select both a video and a thumbnail.');
+    if (!videoFile) {
+      toast.error('Please select a video file.');
       return;
     }
 
     const formData = new FormData();
     formData.append('video', videoFile);
-    formData.append('thumbnail', thumbnailFile);
+    if (thumbnailFile) {
+      formData.append('thumbnail', thumbnailFile);
+    }
     formData.append('videotitle', title);
     formData.append('description', description);
     formData.append('uploader', user?.displayName || user?.email || 'Unknown Channel');
-    formData.append('videochannel', user?.photoURL || 'Unknown Channel');
+    formData.append('videochannel', user?.displayName || user?.email || 'Unknown Channel');
     // formData.append('channelLogo', user?.photoURL || '');
 
     try {
