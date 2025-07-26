@@ -6,38 +6,26 @@ const axios = require("axios");
 
 exports.uploadvideo = async (req, res) => {
   // Check if files exist
-  if (!req.files || !req.files.video) {
+  if (!req.file) {
     return res.status(400).json({ 
       message: "Video file is required (field name: 'video')", 
-      files: req.files, 
-      body: req.body 
     });
   }
-  // Check for required text fields
-  const requiredFields = ["videotitle", "videochannel", "uploader", "description"];
-  const missingFields = requiredFields.filter(f => !req.body[f]);
-  if (missingFields.length > 0) {
-    return res.status(400).json({ 
-      message: `Missing required fields: ${missingFields.join(", ")}` 
-    });
-  }
-  
+
   try {
-    const videoFile = req.files.video[0];
-    const thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
     // Generate a unique ID if not provided
     const videoId = req.body.id;
     
     const file = new Video({
       videotitle: req.body.videotitle,
-      filename: videoFile.originalname,
-      filepath: videoFile.path,
-      filetype: videoFile.mimetype,
-      filesize: videoFile.size,
+      filename: req.file.originalname,
+      filepath: req.file.path,
+      filetype: req.file.mimetype,
+      filesize: req.file.size,
       videochannel: req.body.videochannel,
       uploader: req.body.uploader,
       description: req.body.description,
-      thumbnail: thumbnailFile ? thumbnailFile.path : "",
+      thumbnail: req.file.thumbnail,
       like: 0,
       views: 0,
       _id: new mongoose.Types.ObjectId(videoId)

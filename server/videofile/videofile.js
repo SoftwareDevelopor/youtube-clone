@@ -5,12 +5,7 @@ const fs = require("fs");
 
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Use /tmp/uploads for Render, local uploads otherwise
-    const uploadPath = path.join(__dirname, "../uploads");
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
+    cb(null, "uploads");
   },
   filename: (req, file, cb) => {
     cb(
