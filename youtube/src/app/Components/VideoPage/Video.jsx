@@ -30,10 +30,10 @@ export default function Video() {
 
   let getSingleData = async () => {
     try {
-      let res = await axiosInstance.get("/video/getallvideos");
+      const res = await axios.get('https://youtube-clone-oprs.onrender.com/video/getallvideos');
       let data = res.data.find((v) => String(v._id) === String(id));
       //String(v._id) === String(id) :- first of all _id must be convert into the string then use it , before conversion of _id it is in object form.
-
+      console.log(data)
       setSingleData(data);
     } catch (err) {
       console.error("Error fetching videos:", err);
@@ -190,10 +190,7 @@ export default function Video() {
               >
                 {/* controlsList="nodownload" :- this will remove or hide the download button in controls */}
                 <source
-                  src={`https://youtube-clone-oprs.onrender.com/${singledata.filepath.replace(
-                    /\\/g,
-                    "/"
-                  )}`}
+                  src={`${singledata.filepath}`}
                   type={singledata.filetype}
                 />
               </video>

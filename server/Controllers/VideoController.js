@@ -18,27 +18,18 @@ exports.uploadvideo = async (req, res) => {
   try {
     const videoFile = req.files.video[0];
     const thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
-    
     // Generate a unique ID if not provided
     const videoId = req.body.id || new mongoose.Types.ObjectId().toString();
-    
-    console.log('Video file path:', videoFile.path);
-    console.log('Thumbnail file path:', thumbnailFile ? thumbnailFile.path : 'No thumbnail');
-    
     // Create full URLs for the files
     const baseUrl = 'https://youtube-clone-oprs.onrender.com';
     const videoFilename = path.basename(videoFile.path);
     const thumbnailFilename = thumbnailFile ? path.basename(thumbnailFile.path) : "";
     const videoUrl = `${baseUrl}/uploads/${videoFilename}`;
     const thumbnailUrl = thumbnailFile ? `${baseUrl}/uploads/${thumbnailFilename}` : "";
-    
-    console.log('Video URL:', videoUrl);
-    console.log('Thumbnail URL:', thumbnailUrl);
-    
     const file = new Video({
       videotitle: req.body.videotitle,
       filename: videoFile.originalname,
-      filepath: videoFile.path,
+      filepath: videoUrl,
       filetype: videoFile.mimetype,
       filesize: videoFile.size,
       videochannel: req.body.videochannel,
@@ -49,10 +40,6 @@ exports.uploadvideo = async (req, res) => {
       views: 0,
       _id: new mongoose.Types.ObjectId(videoId)
     });
-    
-    console.log('Saving to database with filepath:', file.filepath);
-    console.log('Saving to database with thumbnail:', file.thumbnail);
-    
     await file.save();
     return res.status(201).json({ message: "File uploaded successfully", videoId: file._id });
   } catch (error) {
