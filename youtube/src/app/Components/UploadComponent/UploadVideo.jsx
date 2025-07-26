@@ -77,7 +77,8 @@ export default function UploadVideo() {
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData || `HTTP error! status: ${response.status}`);
+        console.log('Error response:', errorData);
+        throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();

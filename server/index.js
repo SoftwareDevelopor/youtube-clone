@@ -33,7 +33,7 @@ const io = socketio(server, {
 
 
 app.use(cors({
-  origin: ['https://youtube-clone-one-dun.vercel.app', 'https://youtube-clone-one-dun.vercel.app/'],
+  origin: 'https://youtube-clone-one-dun.vercel.app/',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
