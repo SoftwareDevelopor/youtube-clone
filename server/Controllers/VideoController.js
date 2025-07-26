@@ -61,20 +61,23 @@ exports.getAllVideo = async (req, res) => {
 };
 
 // Increment like count for a video
-// ... existing code ...
-
-// Increment like count for a video
 exports.incrementLike = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('Incrementing like for video ID:', id);
+    
     const video = await Video.findByIdAndUpdate(
       id,
       { $inc: { like: 1 } },
       { new: true }
     );
+    
+    console.log('Updated video:', video);
+    
     if (!video) return res.status(404).json({ message: "Video not found" });
     res.json(video);
   } catch (err) {
+    console.log('Error incrementing like:', err);
     res.status(500).json({ message: "Server error" });
   }
 };

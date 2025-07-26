@@ -21,7 +21,13 @@ videoroute.get("/getallvideos",getAllVideo)
 
 // 
 
-videoroute.patch("/like/:id", incrementLike);
+videoroute.patch("/like/:id", (req, res, next) => {
+  console.log('Like route hit');
+  console.log('Video ID:', req.params.id);
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  next();
+}, incrementLike);
 
 videoroute.get("/download/:id", downloadVideo);
 

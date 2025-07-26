@@ -263,9 +263,9 @@ export default function Video() {
                 </div>
               </div>
 
-              <div className="w-full bg-[#272727] rounded-2xl my-2.5 p-5">
+              <div className="w-full bg-[#272727] rounded-2xl my-2.5 p-5 text-xl">
                 <p>{singledata.views} views</p>
-                <p>{singledata.description}</p>
+                <p >{singledata.description}</p>
               </div>
             </>
           ) : (
@@ -314,7 +314,7 @@ export default function Video() {
 function AddtoLiked({ getSingleData }) {
   let { thumbnail, _id, videotitle, uploader, like } = getSingleData;
 
-  let [likes, setlikes] = useState(like); // initialize with current like count
+  let [likes, setlikes] = useState(like || 0); // initialize with current like count
 
   let likedobject = {
     thumbnail,
@@ -326,19 +326,22 @@ function AddtoLiked({ getSingleData }) {
     e.preventDefault();
     try {
       // Call backend to increment like
-      const res = await axiosInstance.patch(`/video/like/${_id}`);
-      if(res.data.like){
+      const res = await axios.patch(`https://youtube-clone-oprs.onrender.com/video/like/${_id}`);
+      console.log('Like response:', res.data);
+      
+      if (res.data && res.data.like !== undefined) {
         setlikes(res.data.like); // update with new like count from backend
-      }
-      else{
-        alert("Video is liked already !")
+      } else {
+        console.log('Unexpected response format:', res.data);
       }
       
     } catch (err) {
       console.error("Failed to like video", err);
+      if (err.response && err.response.data) {
+        console.log('Error response:', err.response.data);
+      }
     }
   };
-  // Check if the video already exists in likedvideo by id
 
   return (
     <>
