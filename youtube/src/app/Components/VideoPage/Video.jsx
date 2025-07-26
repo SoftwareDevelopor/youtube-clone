@@ -125,17 +125,33 @@ export default function Video() {
       if (!user || !user.email) return alert('You must be logged in to download.');
 
       // 1. Check if user has a free download today
-
-      let freeres=await fetch(`https://youtube-clone-oprs.onrender.com/api/user/hasFreeDownloadToday`,{
-        method:  "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: user.email
-        })
-      })
-      const isFree = freeres.data.free;
+      let freeRes;
+      try {
+        freeRes = await axiosInstance.post('/api/user/hasFreeDownloadToday', { email: user.email });
+      } catch (axiosError) {
+        console.error('Axios request failed, trying fetch:', axiosError);
+        // Fallback to fetch
+        const fetchRes = await fetch('https://youtube-clone-oprs.onrender.com/api/user/hasFreeDownloadToday', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: user.email }),
+        });
+        freeRes = { data: await fetchRes.json() };
+      }
+      
+      // Add proper error handling and default values
+      if (!freeRes || !freeRes.data) {
+        console.error('Invalid response from hasFreeDownloadToday');
+        alert('Error checking download status. Please try again.');
+        return;
+      }
+      
+      const isFree = freeRes.data.free || false; // Default to false if undefined
+      const isPremium = freeRes.data.isPremium || false; // Default to false if undefined
+      
+      console.log('Download check result:', { isFree, isPremium });
 
       // 2. If not free, trigger Razorpay payment
       if (!isFree) {
@@ -199,8 +215,8 @@ export default function Video() {
       // 3. If free, proceed with download
       await doDownload();
     } catch (error) {
-      console.log(error);
-      
+      console.error('Download check failed:', error);
+      alert('Error checking download status. Please try again.');
     }
   }
 
