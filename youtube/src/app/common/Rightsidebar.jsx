@@ -32,7 +32,7 @@ export default function Rightsidebar() {
   let { user } = useContext(MainContextProvider);
   const getVideo = async () => {
     try {
-      const res = await axiosInstance.get("video/getallvideos");
+      const res = await axiosInstance.get("/video/getallvideos");
       console.log(res.data)
       setVideo(res.data);
     } catch (error) {

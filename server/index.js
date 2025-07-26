@@ -121,7 +121,7 @@ app.get("/", (request, response) => {
 
 app.use(bodyparser.json());
 
-app.use("video", videoroute);
+app.use("/video", videoroute);
 app.use("api/user", userrouter);
 
 server.listen(5000,()=>{
