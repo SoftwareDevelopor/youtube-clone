@@ -6,26 +6,31 @@ const axios = require("axios");
 
 exports.uploadvideo = async (req, res) => {
   // Check if files exist
-  if (!req.file) {
+  if (!req.files || !req.files.video) {
     return res.status(400).json({ 
       message: "Video file is required (field name: 'video')", 
+      files: req.files, 
+      body: req.body 
     });
   }
-
+  
+  
   try {
+    const videoFile = req.files.video[0];
+    const thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
     // Generate a unique ID if not provided
     const videoId = req.body.id;
     
     const file = new Video({
       videotitle: req.body.videotitle,
-      filename: req.file.originalname,
-      filepath: req.file.path,
-      filetype: req.file.mimetype,
-      filesize: req.file.size,
+      filename: videoFile.originalname,
+      filepath: videoFile.path,
+      filetype: videoFile.mimetype,
+      filesize: videoFile.size,
       videochannel: req.body.videochannel,
       uploader: req.body.uploader,
       description: req.body.description,
-      thumbnail: req.file.thumbnail,
+      thumbnail: thumbnailFile ? thumbnailFile.path : "",
       like: 0,
       views: 0,
       _id: new mongoose.Types.ObjectId(videoId)

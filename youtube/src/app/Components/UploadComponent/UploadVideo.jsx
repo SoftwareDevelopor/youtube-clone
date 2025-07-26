@@ -68,7 +68,7 @@ export default function UploadVideo() {
     formData.append('videotitle', title);
     formData.append('description', description);
     formData.append('uploader', user?.displayName || user?.email || 'Unknown Channel');
-    formData.append('videochannel', user?.displayName || user?.email || 'Unknown Channel');
+    formData.append('videochannel', user?.photoURL || 'Unknown Channel');
     // formData.append('channelLogo', user?.photoURL || '');
 
     try {
