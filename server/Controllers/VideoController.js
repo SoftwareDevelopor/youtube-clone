@@ -27,8 +27,10 @@ exports.uploadvideo = async (req, res) => {
     
     // Create full URLs for the files
     const baseUrl = 'https://youtube-clone-oprs.onrender.com';
-    const videoUrl = `${baseUrl}/${videoFile.path.replace(/\\/g, '/')}`;
-    const thumbnailUrl = thumbnailFile ? `${baseUrl}/${thumbnailFile.path.replace(/\\/g, '/')}` : "";
+    const videoFilename = path.basename(videoFile.path);
+    const thumbnailFilename = thumbnailFile ? path.basename(thumbnailFile.path) : "";
+    const videoUrl = `${baseUrl}/uploads/${videoFilename}`;
+    const thumbnailUrl = thumbnailFile ? `${baseUrl}/uploads/${thumbnailFilename}` : "";
     
     console.log('Video URL:', videoUrl);
     console.log('Thumbnail URL:', thumbnailUrl);
