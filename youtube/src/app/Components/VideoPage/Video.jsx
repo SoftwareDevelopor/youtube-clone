@@ -462,7 +462,7 @@ function AddtoLiked({ getSingleData }) {
       }
     }
   };
-
+  
   return (
     <>
       <div className="flex items-center gap-3 bg-[#373737] p-2.5 rounded-4xl">

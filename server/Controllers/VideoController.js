@@ -89,6 +89,7 @@ exports.downloadVideo = async (req, res) => {
     
     let VideoTitle=video.videotitle;
     let VideoFileExtension=video.filename
+    let VideoFilePath = video.filepath
     // Set proper headers for video download
     // Tells the browser what type of file it's receiving
     // Ensures proper handling - browser knows it's a video file
@@ -107,7 +108,7 @@ exports.downloadVideo = async (req, res) => {
     // Handles large files - videos can be several GB
     // Faster response - starts sending data immediately
     // Better performance - especially for large video files
-    const fileStream = fs.createReadStream(filePath);
+    const fileStream = fs.createReadStream(VideoFilePath);
     fileStream.pipe(res);
   } catch (err) {
     console.log('Error downloading video:', err);
