@@ -144,7 +144,7 @@ server.listen(5000,()=>{
   console.log('Server is running !')
 })
 
-const dburl = process.env.DB_URL;
+const dburl = process.env;
 
 mongoose
   .connect(dburl)
