@@ -87,7 +87,7 @@ export default function UploadVideo() {
       resetform();
     } catch (err) {
       console.error('Upload failed:', err);
-      toast.error(err.message || 'Upload failed. Please try again.');
+      toast.error(err.error || 'Upload failed. Please try again.');
     }
   };
 

@@ -1,14 +1,10 @@
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const Video = require("../Models/Video");
 const path = require("path");
 const fs = require("fs");
 const axios = require("axios");
 
 exports.uploadvideo = async (req, res) => {
-  console.log('Incoming upload request');
-  console.log('req.files:', req.files);
-  console.log('req.body:', req.body);
-  
   // Check if files exist
   if (!req.files || !req.files.video) {
     return res.status(400).json({ 
@@ -17,7 +13,6 @@ exports.uploadvideo = async (req, res) => {
       body: req.body 
     });
   }
-  
   // Check for required text fields
   const requiredFields = ["videotitle", "videochannel", "uploader", "description"];
   const missingFields = requiredFields.filter(f => !req.body[f]);
@@ -30,9 +25,8 @@ exports.uploadvideo = async (req, res) => {
   try {
     const videoFile = req.files.video[0];
     const thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
-    
     // Generate a unique ID if not provided
-    const videoId = req.body.id || new mongoose.Types.ObjectId().toString();
+    const videoId = req.body.id;
     
     const file = new Video({
       videotitle: req.body.videotitle,
@@ -50,7 +44,7 @@ exports.uploadvideo = async (req, res) => {
     });
     
     await file.save();
-    return res.status(201).json({ message: "File uploaded successfully", videoId: file._id });
+    return res.status(201).json({ message: "File uploaded successfully" });
   } catch (error) {
     console.log('Upload error:', error);
     return res.status(500).json({ 
