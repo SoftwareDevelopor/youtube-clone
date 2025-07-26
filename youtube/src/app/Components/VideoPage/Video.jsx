@@ -125,8 +125,17 @@ export default function Video() {
       if (!user || !user.email) return alert('You must be logged in to download.');
 
       // 1. Check if user has a free download today
-      const freeRes = await axiosInstance.post('/api/user/hasFreeDownloadToday', { email: user.email });
-      const isFree = freeRes.data.free;
+
+      let freeres=await fetch(`https://youtube-clone-oprs.onrender.com/api/user/hasFreeDownloadToday`,{
+        method:  "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.email
+        })
+      })
+      const isFree = freeres.data.free;
 
       // 2. If not free, trigger Razorpay payment
       if (!isFree) {
@@ -197,7 +206,7 @@ export default function Video() {
 
   async function doDownload() {
     // Fetch the file as a blob from the download endpoint
-    const response = await axiosInstance.get(`/video/download/${singledata._id}`, {
+    const response = await axios.get(`https://youtube-clone-oprs.onrender.com/video/download/${singledata._id}`, {
       responseType: 'blob',
     });
     // Create a link and trigger download
@@ -212,14 +221,24 @@ export default function Video() {
     // Save to downloads in context
     setDownloads(prev => {
       // Avoid duplicates by _id
-      if (prev.some(v => v._id === singledata._id)) return prev;
+      if (prev.some(v => v._id == singledata._id)) return prev;
       return [...prev, singledata];
     });
     // Record download in backend
     try {
-      await axiosInstance.post('/api/user/recordDownload', { email: user.email, videoId: singledata._id });
+      await fetch(`https://youtube-clone-oprs.onrender.com/api/user/recordDownload`,{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.email,
+          videoId: singledata._id
+        })
+      })
     } catch (err) {
       // Ignore error
+      console.log(err)
     }
   }
 
@@ -230,8 +249,6 @@ export default function Video() {
   const handleCheckboxChange = (event) => {
     const isChecked = event.target.checked;
     setinputvalue(isChecked);
-    
-
   };
 
   return (
