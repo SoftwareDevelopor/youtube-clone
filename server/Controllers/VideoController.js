@@ -87,12 +87,29 @@ exports.downloadVideo = async (req, res) => {
     const video = await Video.findById(req.params.id);
     if (!video) return res.status(404).send("Video not found");
 
-    const filePath = path.join(__dirname, "..", video.filepath);
+    // Extract filename from the full URL stored in filepath
+    const filename = path.basename(video.filepath);
+    const uploadsPath = process.env.RENDER ? '/tmp/uploads' : path.join(__dirname, "../uploads");
+    const filePath = path.join(uploadsPath, filename);
+    
+    console.log('Download request for video:', video.videotitle);
+    console.log('File path:', filePath);
+    console.log('File exists:', fs.existsSync(filePath));
+    
     if (!fs.existsSync(filePath)) {
+      console.log('File not found at path:', filePath);
       return res.status(404).send("File not found");
     }
-    res.download(filePath, video.videotitle + path.extname(filePath));
+    
+    // Set proper headers for video download
+    res.setHeader('Content-Type', video.filetype || 'video/mp4');
+    res.setHeader('Content-Disposition', `attachment; filename="${video.videotitle}.${path.extname(filename)}"`);
+    
+    // Stream the file
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
   } catch (err) {
+    console.log('Error downloading video:', err);
     res.status(500).send("Error downloading video");
   }
 };

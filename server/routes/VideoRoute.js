@@ -31,6 +31,10 @@ videoroute.patch("/like/:id", (req, res, next) => {
 
 videoroute.get("/download/:id", downloadVideo);
 
+videoroute.get("/test-download", (req, res) => {
+  res.json({ message: "Download endpoint is working" });
+});
+
 videoroute.post("/downloadandsave", downloadAndSaveVideo);
 
 

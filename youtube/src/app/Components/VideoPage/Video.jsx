@@ -205,40 +205,68 @@ export default function Video() {
   }
 
   async function doDownload() {
-    // Fetch the file as a blob from the download endpoint
-    const response = await axios.get(`https://youtube-clone-oprs.onrender.com/video/download/${singledata._id}`, {
-      responseType: 'blob',
-    });
-    // Create a link and trigger download
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', singledata.videotitle + (singledata.filetype ? '.' + singledata.filetype.split('/')[1] : ''));
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
-    // Save to downloads in context
-    setDownloads(prev => {
-      // Avoid duplicates by _id
-      if (prev.some(v => v._id == singledata._id)) return prev;
-      return [...prev, singledata];
-    });
-    // Record download in backend
     try {
-      await fetch(`https://youtube-clone-oprs.onrender.com/api/user/recordDownload`,{
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: user.email,
-          videoId: singledata._id
-        })
-      })
-    } catch (err) {
-      // Ignore error
-      console.log(err)
+      console.log('Starting download for video:', singledata.videotitle);
+      console.log('Video ID:', singledata._id);
+      
+      // Fetch the file as a blob from the download endpoint
+      const response = await axios.get(`https://youtube-clone-oprs.onrender.com/video/download/${singledata._id}`, {
+        responseType: 'blob',
+      });
+      
+      console.log('Download response received, size:', response.data.size);
+      
+      // Create a link and trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Set filename with proper extension
+      const fileExtension = singledata.filetype ? '.' + singledata.filetype.split('/')[1] : '.mp4';
+      const filename = singledata.videotitle.replace(/[^a-z0-9]/gi, '_') + fileExtension;
+      link.setAttribute('download', filename);
+      
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      console.log('Download completed successfully');
+      
+      // Save to downloads in context
+      setDownloads(prev => {
+        // Avoid duplicates by _id
+        if (prev.some(v => v._id == singledata._id)) return prev;
+        return [...prev, singledata];
+      });
+      
+      // Record download in backend
+      try {
+        const recordResponse = await fetch(`https://youtube-clone-oprs.onrender.com/api/user/recordDownload`,{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: user.email,
+            videoId: singledata._id
+          })
+        });
+        
+        if (recordResponse.ok) {
+          console.log('Download recorded successfully');
+        } else {
+          console.error('Failed to record download');
+        }
+      } catch (err) {
+        console.error('Error recording download:', err);
+      }
+      
+      alert('Video downloaded successfully!');
+      
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Download failed. Please try again.');
     }
   }
 
