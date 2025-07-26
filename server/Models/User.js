@@ -15,6 +15,14 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  isPremium: {
+    type: Boolean,
+    default: false
+  },
+  premiumExpiry: {
+    type: Date,
+    default: null
+  },
   downloads: [
     {
       date: { type: Date, required: true },

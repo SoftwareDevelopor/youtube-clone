@@ -8,6 +8,8 @@ import { CiSearch } from "react-icons/ci";
 export default function ChannelPage() {
   let { user } = useContext(MainContextProvider);
   const [points, setPoints] = useState(null);
+  const [isPremium, setIsPremium] = useState(false);
+  const [premiumExpiry, setPremiumExpiry] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   
   const [previewImageUrl, setPreviewImageUrl] = useState(null);
@@ -70,8 +72,34 @@ export default function ChannelPage() {
     fetchPoints();
   };
 
+  const checkPremiumStatus = async () => {
+    if (user && user.email) {
+      try {
+        const response = await fetch("https://youtube-clone-oprs.onrender.com/api/user/checkPremiumStatus", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: user.email,
+          }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setIsPremium(data.isPremium);
+          setPremiumExpiry(data.premiumExpiry);
+        } else {
+          console.error(data.message || "Failed to check premium status");
+        }
+      } catch (error) {
+        console.error("Error checking premium status:", error);
+      }
+    }
+  };
+
   useEffect(() => {
     fetchPoints();
+    checkPremiumStatus();
   }, [user]);
 
   // Refresh points when component becomes visible (when user navigates back)
@@ -168,6 +196,20 @@ export default function ChannelPage() {
           <p className="mb-3 text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
             {points !== null ? `Points: ${points}` : "Loading points..."}
           </p>
+          {isPremium && (
+            <div className="mb-3 p-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg">
+              <p className="text-white font-bold text-lg">⭐ Premium Member</p>
+              <p className="text-white text-sm">
+                Unlimited downloads until {premiumExpiry ? new Date(premiumExpiry).toLocaleDateString() : 'N/A'}
+              </p>
+            </div>
+          )}
+          {!isPremium && (
+            <div className="mb-3 p-3 bg-gray-100 rounded-lg">
+              <p className="text-gray-700 font-semibold">Free Plan</p>
+              <p className="text-gray-600 text-sm">1 download per day. Upgrade to Premium for unlimited downloads!</p>
+            </div>
+          )}
           <p className="text-sm sm:text-base">
             This is the Description.
           </p>

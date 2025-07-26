@@ -144,11 +144,37 @@ export default function Video() {
           key: 'rzp_test_1DP5mmOlF5G5ag', // Replace with your test key if needed
           amount: 10000, // 100 INR in paise
           currency: 'INR',
-          name: 'Video Download',
-          description: 'Pay to download extra video',
+          name: 'Video Download Premium',
+          description: 'Premium Plan - Unlimited Downloads for 30 Days',
           handler: async function (response) {
-            // On payment success, proceed with download
-            await doDownload();
+            // On payment success, activate premium plan and proceed with download
+            try {
+              // Activate premium plan
+              const premiumResponse = await fetch("https://youtube-clone-oprs.onrender.com/api/user/activatePremium", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  email: user.email,
+                  duration: 30, // 30 days premium
+                }),
+              });
+              
+              if (premiumResponse.ok) {
+                console.log('Premium plan activated successfully');
+                alert('Premium plan activated! You now have unlimited downloads for 30 days.');
+              } else {
+                console.error('Failed to activate premium plan');
+              }
+              
+              // Proceed with download
+              await doDownload();
+            } catch (error) {
+              console.error('Error activating premium plan:', error);
+              // Still proceed with download even if premium activation fails
+              await doDownload();
+            }
           },
           prefill: {
             email: user.email,

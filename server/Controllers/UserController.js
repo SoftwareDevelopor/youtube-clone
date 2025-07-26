@@ -65,6 +65,20 @@ exports.hasFreeDownloadToday = async (req, res) => {
     if (!email) return res.status(400).json({ message: 'email is required.' });
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: 'User not found.' });
+    
+    // Check if premium has expired
+    if (user.isPremium && user.premiumExpiry && new Date() > user.premiumExpiry) {
+      user.isPremium = false;
+      user.premiumExpiry = null;
+      await user.save();
+    }
+    
+    // Premium users get unlimited downloads
+    if (user.isPremium) {
+      return res.json({ free: true, isPremium: true });
+    }
+    
+    // Free users get 1 download per day
     const today = new Date();
     today.setHours(0,0,0,0);
     const downloadsToday = user.downloads.filter(d => {
@@ -72,7 +86,7 @@ exports.hasFreeDownloadToday = async (req, res) => {
       dDate.setHours(0,0,0,0);
       return dDate.getTime() === today.getTime();
     });
-    res.json({ free: downloadsToday.length < 1 });
+    res.json({ free: downloadsToday.length < 1, isPremium: false });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -88,6 +102,55 @@ exports.recordDownload = async (req, res) => {
     user.downloads.push({ date: new Date(), videoId });
     await user.save();
     res.json({ message: 'Download recorded.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Activate premium plan for a user
+exports.activatePremium = async (req, res) => {
+  try {
+    const { email, duration = 30 } = req.body; // duration in days, default 30 days
+    if (!email) return res.status(400).json({ message: 'email is required.' });
+    
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+    
+    // Set premium status and expiry date
+    user.isPremium = true;
+    user.premiumExpiry = new Date(Date.now() + duration * 24 * 60 * 60 * 1000); // Add days to current date
+    await user.save();
+    
+    res.json({ 
+      message: 'Premium plan activated successfully', 
+      isPremium: user.isPremium,
+      premiumExpiry: user.premiumExpiry 
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Check premium status
+exports.checkPremiumStatus = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'email is required.' });
+    
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+    
+    // Check if premium has expired
+    if (user.isPremium && user.premiumExpiry && new Date() > user.premiumExpiry) {
+      user.isPremium = false;
+      user.premiumExpiry = null;
+      await user.save();
+    }
+    
+    res.json({ 
+      isPremium: user.isPremium,
+      premiumExpiry: user.premiumExpiry 
+    });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
