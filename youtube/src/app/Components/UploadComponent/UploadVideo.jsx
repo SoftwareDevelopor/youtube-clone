@@ -66,31 +66,27 @@ export default function UploadVideo() {
     formData.append('videotitle', title);
     formData.append('description', description);
     formData.append('uploader', user?.displayName || user?.email || 'Unknown Channel');
-    formData.append('videochannel', user?.photoURL || 'Unknown Channel');
+    formData.append('videochannel', user?.displayName || user?.email || 'Unknown Channel');
     // formData.append('channelLogo', user?.photoURL || '');
 
     try {
-      await fetch('https://youtube-clone-oprs.onrender.com/video/upload', {
+      const response = await fetch('https://youtube-clone-oprs.onrender.com/video/upload', {
         method: 'POST',
         body: formData
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Upload successful:', data);
-      })
-      .catch(error => {
-        console.error('Upload failed:', error);
       });
-      toast.success("Upload Successfully !")
-      resetform()
-    } catch (err) {
-      console.log('An error occurred: ' + err.message);
       
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Upload successful:', data);
+      toast.success("Upload Successfully!");
+      resetform();
+    } catch (err) {
+      console.error('Upload failed:', err);
+      toast.error(err.message || 'Upload failed. Please try again.');
     }
   };
 

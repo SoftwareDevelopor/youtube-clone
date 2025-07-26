@@ -6,15 +6,34 @@ const axios = require("axios");
 
 exports.uploadvideo = async (req, res) => {
   console.log('Incoming upload request');
+  console.log('req.files:', req.files);
+  console.log('req.body:', req.body);
   
+  // Check if files exist
+  if (!req.files || !req.files.video) {
+    return res.status(400).json({ 
+      message: "Video file is required (field name: 'video')", 
+      files: req.files, 
+      body: req.body 
+    });
+  }
   
-  if (!req.files || !req.body) {
-    return res.status(404).json({ message: "Upload them", files: req.files, body: req.body });
+  // Check for required text fields
+  const requiredFields = ["videotitle", "videochannel", "uploader", "description"];
+  const missingFields = requiredFields.filter(f => !req.body[f]);
+  if (missingFields.length > 0) {
+    return res.status(400).json({ 
+      message: `Missing required fields: ${missingFields.join(", ")}` 
+    });
   }
   
   try {
     const videoFile = req.files.video[0];
-    const thumbnailFile = req.files.thumbnail[0];
+    const thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
+    
+    // Generate a unique ID if not provided
+    const videoId = req.body.id || new mongoose.Types.ObjectId().toString();
+    
     const file = new Video({
       videotitle: req.body.videotitle,
       filename: videoFile.originalname,
@@ -24,16 +43,20 @@ exports.uploadvideo = async (req, res) => {
       videochannel: req.body.videochannel,
       uploader: req.body.uploader,
       description: req.body.description,
-      thumbnail: thumbnailFile.path,
+      thumbnail: thumbnailFile ? thumbnailFile.path : "",
       like: 0,
       views: 0,
-      _id: new mongoose.Types.ObjectId(req.body.id)
+      _id: new mongoose.Types.ObjectId(videoId)
     });
+    
     await file.save();
-    return res.status(201).json("file uploaded");
+    return res.status(201).json({ message: "File uploaded successfully", videoId: file._id });
   } catch (error) {
     console.log('Upload error:', error);
-    return res.status(500).json({ message: "Something Went Wrong !", error: error.message });
+    return res.status(500).json({ 
+      message: "Something Went Wrong!", 
+      error: error.message 
+    });
   }
 };
 
