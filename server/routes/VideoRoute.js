@@ -35,6 +35,9 @@ videoroute.get("/test-download", (req, res) => {
   res.json({ message: "Download endpoint is working" });
 });
 
+// Debug route to list files in uploads directory
+videoroute.get("/debug-uploads");
+
 videoroute.post("/downloadandsave", downloadAndSaveVideo);
 
 

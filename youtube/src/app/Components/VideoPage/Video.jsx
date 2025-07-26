@@ -198,7 +198,7 @@ export default function Video() {
             } catch (error) {
               console.error('Error activating premium plan:', error);
               // Still proceed with download even if premium activation fails
-              await doDownload();
+            await doDownload();
             }
           },
           prefill: {
@@ -225,39 +225,39 @@ export default function Video() {
       console.log('Starting download for video:', singledata.videotitle);
       console.log('Video ID:', singledata._id);
       
-      // Fetch the file as a blob from the download endpoint
+    // Fetch the file as a blob from the download endpoint
       const response = await axios.get(`https://youtube-clone-oprs.onrender.com/video/download/${singledata._id}`, {
-        responseType: 'blob',
-      });
+      responseType: 'blob',
+    });
       
       console.log('Download response received, size:', response.data.size);
       
-      // Create a link and trigger download
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
+    // Create a link and trigger download
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
       
       // Set filename with proper extension
       const fileExtension = singledata.filetype ? '.' + singledata.filetype.split('/')[1] : '.mp4';
       const filename = singledata.videotitle.replace(/[^a-z0-9]/gi, '_') + fileExtension;
       link.setAttribute('download', filename);
       
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
       
       console.log('Download completed successfully');
       
-      // Save to downloads in context
-      setDownloads(prev => {
-        // Avoid duplicates by _id
+    // Save to downloads in context
+    setDownloads(prev => {
+      // Avoid duplicates by _id
         if (prev.some(v => v._id == singledata._id)) return prev;
-        return [...prev, singledata];
-      });
+      return [...prev, singledata];
+    });
       
-      // Record download in backend
-      try {
+    // Record download in backend
+    try {
         const recordResponse = await fetch(`https://youtube-clone-oprs.onrender.com/api/user/recordDownload`,{
           method: "POST",
           headers: {
@@ -274,7 +274,7 @@ export default function Video() {
         } else {
           console.error('Failed to record download');
         }
-      } catch (err) {
+    } catch (err) {
         console.error('Error recording download:', err);
       }
       

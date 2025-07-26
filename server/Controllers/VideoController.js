@@ -86,26 +86,27 @@ exports.downloadVideo = async (req, res) => {
   try {
     const video = await Video.findById(req.params.id);
     if (!video) return res.status(404).send("Video not found");
-
-    // Extract filename from the full URL stored in filepath
-    const filename = path.basename(video.filepath);
-    const uploadsPath = process.env.RENDER ? '/tmp/uploads' : path.join(__dirname, "../uploads");
-    const filePath = path.join(uploadsPath, filename);
     
-    console.log('Download request for video:', video.videotitle);
-    console.log('File path:', filePath);
-    console.log('File exists:', fs.existsSync(filePath));
-    
-    if (!fs.existsSync(filePath)) {
-      console.log('File not found at path:', filePath);
-      return res.status(404).send("File not found");
-    }
-    
+    let VideoTitle=video.videotitle;
+    let VideoFileExtension=video.filename
     // Set proper headers for video download
+    // Tells the browser what type of file it's receiving
+    // Ensures proper handling - browser knows it's a video file
+    // Prevents errors - without this, browser might not know how to handle the file
+    // Fallback to 'video/mp4' - if filetype is missing, defaults to MP4
     res.setHeader('Content-Type', video.filetype || 'video/mp4');
-    res.setHeader('Content-Disposition', `attachment; filename="${video.videotitle}.${path.extname(filename)}"`);
+
+    // Set proper headers for video download
+    //Forces download - attachment tells browser to download, not play
+    // Sets filename - user gets a meaningful filename instead of random ID
+    // Preserves extension - keeps the original file extension (.mp4, .webm, etc.)
+    res.setHeader('Content-Disposition', `attachment; filename="${VideoTitle}.${path.extname(VideoFileExtension)}"`);
     
     // Stream the file
+    // Memory efficient - doesn't load entire file into memory
+    // Handles large files - videos can be several GB
+    // Faster response - starts sending data immediately
+    // Better performance - especially for large video files
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
   } catch (err) {
@@ -115,6 +116,7 @@ exports.downloadVideo = async (req, res) => {
 };
 
 exports.downloadAndSaveVideo = async (req, res) => {
+  console.log(req.body)
   const { url, videotitle, videochannel, uploader, description, thumbnail } =
     req.body;
   if (
