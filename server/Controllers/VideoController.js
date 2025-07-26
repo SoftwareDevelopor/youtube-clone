@@ -25,6 +25,14 @@ exports.uploadvideo = async (req, res) => {
     console.log('Video file path:', videoFile.path);
     console.log('Thumbnail file path:', thumbnailFile ? thumbnailFile.path : 'No thumbnail');
     
+    // Create full URLs for the files
+    const baseUrl = 'https://youtube-clone-oprs.onrender.com';
+    const videoUrl = `${baseUrl}/${videoFile.path.replace(/\\/g, '/')}`;
+    const thumbnailUrl = thumbnailFile ? `${baseUrl}/${thumbnailFile.path.replace(/\\/g, '/')}` : "";
+    
+    console.log('Video URL:', videoUrl);
+    console.log('Thumbnail URL:', thumbnailUrl);
+    
     const file = new Video({
       videotitle: req.body.videotitle,
       filename: videoFile.originalname,
@@ -34,7 +42,7 @@ exports.uploadvideo = async (req, res) => {
       videochannel: req.body.videochannel,
       uploader: req.body.uploader,
       description: req.body.description,
-      thumbnail: thumbnailFile ? thumbnailFile.path : "",
+      thumbnail: thumbnailUrl,
       like: 0,
       views: 0,
       _id: new mongoose.Types.ObjectId(videoId)
