@@ -6,7 +6,8 @@ import axiosInstance from "../Components/axioscomponent/axiosinstances";
 import NavSlider from "../Components/Navitems/NavSlider";
 import Link from "next/link";
 import { MainContextProvider } from "../MainContext";
-import { formatDynamicAPIAccesses } from "next/dist/server/app-render/dynamic-rendering";
+import axios from "axios";
+
 
 function timeAgo(date) {
   const now = new Date();
@@ -32,11 +33,10 @@ export default function Rightsidebar() {
   let { user } = useContext(MainContextProvider);
   const getVideo = async () => {
     try {
-      const res = await axiosInstance.get("/video/getallvideos");
-      console.log(res.data)
-      setVideo(res.data);
+      const res = await axios.get('https://youtube-clone-oprs.onrender.com/video/getallvideos');
+      console.log(res)
     } catch (error) {
-      
+      console.log(error)
     }
   };
   // Determine grid layout: row-wise if video, column-wise otherwise
@@ -51,7 +51,7 @@ export default function Rightsidebar() {
         
           className="grid lg:grid-cols-3 grid-cols-1 items-center gap-6"
         >
-          {video && user? (
+          {/* {video && user? (
             video.map((vid, idx) => (
               <div className="rounded-lg" key={idx}>
                 <Link href={`/videopage/${vid._id}`}>
@@ -98,7 +98,7 @@ export default function Rightsidebar() {
               Please Sign In User & Try Uploading Videos
             </div>
           )
-          }
+          } */}
         </div>
       </div>
     </>
