@@ -4,7 +4,16 @@ const { upload } = require("../videofile/videofile");
 
 const videoroute=express.Router();
 
-videoroute.post("/upload", upload.fields([
+// Test route to check if requests are reaching the server
+videoroute.get("/test", (req, res) => {
+  res.json({ message: "Video route is working" });
+});
+
+videoroute.post("/upload", (req, res, next) => {
+  console.log("Upload route hit");
+  console.log("Headers:", req.headers);
+  next();
+}, upload.fields([
   { name: "video", maxCount: 1 },
   { name: "thumbnail", maxCount: 1 }
 ]), uploadvideo);

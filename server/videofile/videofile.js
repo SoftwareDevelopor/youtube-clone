@@ -1,9 +1,16 @@
 "use strict";
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
 let storage = multer.diskStorage({
-  destination: (req, res, cb) => {
+  destination: (req, file, cb) => {
     // Use /tmp/uploads for Render, local uploads otherwise
-    cb(null, "uploads");
+    const uploadPath = process.env.RENDER ? '/tmp/uploads' : path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     cb(

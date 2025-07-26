@@ -110,7 +110,7 @@ io.on("Connection", (socket) => {
 });
 
 // Serve uploads folder statically
-app.use("uploads", express.static(path.join(__dirname, "uploads"))); //this will implement the converting the backslash with the forward slash. then it works definitely.y
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(express.json({ limit: '200mb' }));
 app.use(express.urlencoded({ limit: '200mb', extended: true }));
@@ -128,7 +128,7 @@ server.listen(5000,()=>{
   console.log('Server is running !')
 })
 
-const dburl = process.env.DB_URL || 'mongodb+srv://saurabh123:saurabhkumar124@@cluster0.idzl30m.mongodb.net/';
+const dburl = process.env.DB_URL;
 
 mongoose
   .connect(dburl)
