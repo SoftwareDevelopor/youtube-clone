@@ -55,7 +55,7 @@ export default function ChannelPage() {
         });
         const data = await response.json();
         if (response.ok) {
-          setPoints(data.points);
+          setPoints(data.points); // Update points state with new total
           console.log(`Points incremented by ${increment}. New total: ${data.points}`);
         } else {
           console.error(data.message || "Failed to increment points");
@@ -66,8 +66,26 @@ export default function ChannelPage() {
     }
   };
 
+  const refreshPoints = () => {
+    fetchPoints();
+  };
+
   useEffect(() => {
     fetchPoints();
+  }, [user]);
+
+  // Refresh points when component becomes visible (when user navigates back)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user) {
+        fetchPoints();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [user]);
 
 
@@ -150,12 +168,6 @@ export default function ChannelPage() {
           <p className="mb-3 text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
             {points !== null ? `Points: ${points}` : "Loading points..."}
           </p>
-          <button
-            onClick={() => incrementPoints(5)}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg mb-3 hover:bg-green-700 transition"
-          >
-            Add 5 Points (Test)
-          </button>
           <p className="text-sm sm:text-base">
             This is the Description.
           </p>
@@ -188,3 +200,4 @@ export default function ChannelPage() {
     </div>
   );
 }
+

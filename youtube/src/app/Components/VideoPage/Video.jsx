@@ -41,9 +41,42 @@ export default function Video() {
     }
   };
 
+  const incrementPointsForWatching = async () => {
+    if (user && user.displayName && user.email) {
+      try {
+        const response = await fetch("https://youtube-clone-oprs.onrender.com/api/user/addPoints", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: user.displayName,
+            email: user.email,
+            increment: 5, // 5 points for watching a video
+          }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          console.log(`Points incremented by 5 for watching video. New total: ${data.points}`);
+        } else {
+          console.error(data.message || "Failed to increment points for watching");
+        }
+      } catch (error) {
+        console.error("Error incrementing points for watching:", error);
+      }
+    }
+  };
+
   useEffect(() => {
     getSingleData();
   }, []);
+
+  // Increment points when video is loaded and user is logged in
+  useEffect(() => {
+    if (singledata && user) {
+      incrementPointsForWatching();
+    }
+  }, [singledata, user]);
 
   let [visible, setvisible] = useState(0);
   let [modalVisible, setModalVisible] = useState(false);
