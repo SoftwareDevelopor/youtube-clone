@@ -18,8 +18,12 @@ exports.uploadvideo = async (req, res) => {
   try {
     const videoFile = req.files.video[0];
     const thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
+    
     // Generate a unique ID if not provided
-    const videoId = req.body.id;
+    const videoId = req.body.id || new mongoose.Types.ObjectId().toString();
+    
+    console.log('Video file path:', videoFile.path);
+    console.log('Thumbnail file path:', thumbnailFile ? thumbnailFile.path : 'No thumbnail');
     
     const file = new Video({
       videotitle: req.body.videotitle,
@@ -36,8 +40,11 @@ exports.uploadvideo = async (req, res) => {
       _id: new mongoose.Types.ObjectId(videoId)
     });
     
+    console.log('Saving to database with filepath:', file.filepath);
+    console.log('Saving to database with thumbnail:', file.thumbnail);
+    
     await file.save();
-    return res.status(201).json({ message: "File uploaded successfully" });
+    return res.status(201).json({ message: "File uploaded successfully", videoId: file._id });
   } catch (error) {
     console.log('Upload error:', error);
     return res.status(500).json({ 

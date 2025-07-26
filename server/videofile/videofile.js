@@ -7,16 +7,17 @@ let storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Use /tmp/uploads for Render, local uploads otherwise
     const uploadPath = process.env.RENDER ? '/tmp/uploads' : path.join(__dirname, "../uploads");
+    console.log('Multer destination path:', uploadPath);
+    console.log('RENDER env var:', process.env.RENDER);
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    cb(
-      null,
-      new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname
-    );
+    const filename = new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname;
+    console.log('Multer filename:', filename);
+    cb(null, filename);
   },
 });
 

@@ -58,7 +58,7 @@ export default function Rightsidebar() {
                 <Link href={`/videopage/${vid._id}`}>
                   <img
                     className="rounded-lg"
-                    src={`${vid.thumbnail}`}
+                    src={`https://youtube-clone-oprs.onrender.com/${vid.thumbnail.replace(/\\/g, "/")}`}
                     alt={vid.videotitle}
                   />
                 </Link>
