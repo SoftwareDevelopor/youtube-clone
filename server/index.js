@@ -26,14 +26,14 @@ const server = http.createServer(app);
 
 const io = socketio(server, {
   cors: {
-    origin: "https://youtube-clone-one-dun.vercel.app",
+    origin: "https://youtube-clone-one-dun.vercel.app/",
     method: ["GET", "POST"],
   },
 });
 
 
 app.use(cors({
-  origin: 'https://youtube-clone-one-dun.vercel.app',
+  origin: 'https://youtube-clone-one-dun.vercel.app/',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -110,7 +110,7 @@ io.on("Connection", (socket) => {
 });
 
 // Serve uploads folder statically
-app.use("/uploads", express.static(path.join(__dirname, "uploads"))); //this will implement the converting the backslash with the forward slash. then it works definitely.y
+app.use("uploads", express.static(path.join(__dirname, "uploads"))); //this will implement the converting the backslash with the forward slash. then it works definitely.y
 
 app.use(express.json({ limit: '200mb' }));
 app.use(express.urlencoded({ limit: '200mb', extended: true }));
@@ -121,16 +121,15 @@ app.get("/", (request, response) => {
 
 app.use(bodyparser.json());
 
-app.use("/video", videoroute);
-app.use("/api/user", userrouter);
+app.use("video", videoroute);
+app.use("api/user", userrouter);
 
 server.listen(5000,()=>{
   console.log('Server is running !')
 })
+
+
 const dburl = process.env.DB_URL;
-
-
-
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(dburl, {
