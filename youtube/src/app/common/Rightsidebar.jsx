@@ -34,7 +34,7 @@ export default function Rightsidebar() {
   const getVideo = async () => {
     try {
       const res = await axios.get('https://youtube-clone-oprs.onrender.com/video/getallvideos');
-      console.log(res)
+      setVideo(res.data)
     } catch (error) {
       console.log(error)
     }
@@ -51,7 +51,7 @@ export default function Rightsidebar() {
         
           className="grid lg:grid-cols-3 grid-cols-1 items-center gap-6"
         >
-          {/* {video && user? (
+          {video && user? (
             video.map((vid, idx) => (
               <div className="rounded-lg" key={idx}>
                 <Link href={`/videopage/${vid._id}`}>
@@ -98,7 +98,7 @@ export default function Rightsidebar() {
               Please Sign In User & Try Uploading Videos
             </div>
           )
-          } */}
+          }
         </div>
       </div>
     </>
