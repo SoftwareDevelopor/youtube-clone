@@ -3,7 +3,8 @@ const cors = require("cors");
 const bodyparser = require("body-parser");
 const http = require("http");
 const dotenv = require("dotenv");
-const mongoose = require("mongoose");
+
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
 const videoroute = require("./routes/VideoRoute");
 
@@ -11,6 +12,7 @@ const fs = require("fs");
 const path = require("path");
 const userrouter = require("./routes/UserRoute");
 const socketio = require("socket.io");
+
 
 const Recording = require("./Models/Recording.js"); // Fixed casing to match file system
 
@@ -127,11 +129,29 @@ server.listen(5000,()=>{
 })
 const dburl = process.env.DB_URL;
 
-mongoose
-  .connect(dburl)
-  .then(() => {
-    console.log("Connection is Established !");
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+
+
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(dburl, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("saurabhkumar13618").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
+

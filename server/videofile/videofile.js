@@ -1,8 +1,5 @@
 "use strict";
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-
 let storage = multer.diskStorage({
   destination: (req, res, cb) => {
     // Use /tmp/uploads for Render, local uploads otherwise
