@@ -1,24 +1,59 @@
 const User = require('../Models/User');
 
 // Add or update user points
-exports.addPoints = async (req, res) => {
+exports.getPoints = async (req, res) => {
   try {
-    const { username, email, increment } = req.body;
+    const { username, email } = req.body;
     if (!username || !email) {
       return res.status(400).json({ message: 'username and email are required.' });
     }
+    
+    console.log('Getting points for user:', { username, email });
+    
     // Find user or create if not exists
     let user = await User.findOne({ username, email });
     if (!user) {
       user = new User({ username, email, points: 0 });
-    }
-    // If increment is a number, add to points
-    if (typeof increment === 'number') {
-      user.points += increment;
       await user.save();
+      console.log('Created new user with 0 points');
+    } else {
+      console.log('Found existing user with points:', user.points);
     }
+    
     res.json({ message: 'Points fetched successfully', points: user.points });
   } catch (err) {
+    console.log('Error in getPoints:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+exports.addPoints = async (req, res) => {
+  try {
+    const { username, email, increment = 1 } = req.body; // Default increment of 1
+    if (!username || !email) {
+      return res.status(400).json({ message: 'username and email are required.' });
+    }
+    
+    console.log('Adding points for user:', { username, email, increment });
+    
+    // Find user or create if not exists
+    let user = await User.findOne({ username, email });
+    if (!user) {
+      user = new User({ username, email, points: 0 });
+      console.log('Created new user with 0 points');
+    } else {
+      console.log('Found existing user with points:', user.points);
+    }
+    
+    // Add points (default increment is 1)
+    user.points += increment;
+    await user.save();
+    
+    console.log('Updated user points to:', user.points);
+    
+    res.json({ message: 'Points updated successfully', points: user.points });
+  } catch (err) {
+    console.log('Error in addPoints:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };

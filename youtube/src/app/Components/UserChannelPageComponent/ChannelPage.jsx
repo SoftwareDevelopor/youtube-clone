@@ -15,7 +15,7 @@ export default function ChannelPage() {
   const fetchPoints = async () => {
     if (user && user.displayName && user.email) {
       try {
-        const response = await fetch("https://youtube-clone-oprs.onrender.com/api/user/addPoints", {
+        const response = await fetch("https://youtube-clone-oprs.onrender.com/api/user/getPoints", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -35,6 +35,33 @@ export default function ChannelPage() {
       } catch (error) {
         setPoints(null);
         console.error("Error fetching points:", error);
+      }
+    }
+  };
+
+  const incrementPoints = async (increment = 1) => {
+    if (user && user.displayName && user.email) {
+      try {
+        const response = await fetch("https://youtube-clone-oprs.onrender.com/api/user/addPoints", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: user.displayName,
+            email: user.email,
+            increment: increment,
+          }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setPoints(data.points);
+          console.log(`Points incremented by ${increment}. New total: ${data.points}`);
+        } else {
+          console.error(data.message || "Failed to increment points");
+        }
+      } catch (error) {
+        console.error("Error incrementing points:", error);
       }
     }
   };
@@ -123,6 +150,12 @@ export default function ChannelPage() {
           <p className="mb-3 text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
             {points !== null ? `Points: ${points}` : "Loading points..."}
           </p>
+          <button
+            onClick={() => incrementPoints(5)}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg mb-3 hover:bg-green-700 transition"
+          >
+            Add 5 Points (Test)
+          </button>
           <p className="text-sm sm:text-base">
             This is the Description.
           </p>
