@@ -66,7 +66,7 @@ export default function UploadVideo() {
     formData.append('videotitle', title);
     formData.append('description', description);
     formData.append('uploader', user?.displayName || user?.email || 'Unknown Channel');
-    formData.append('videochannel', user?.displayName || user?.email || 'Unknown Channel');
+    formData.append('videochannel', user?.photoURL || 'Unknown Channel');
     // formData.append('channelLogo', user?.photoURL || '');
 
     try {
@@ -82,7 +82,6 @@ export default function UploadVideo() {
       }
       
       const data = await response.json();
-      console.log('Upload successful:', data);
       toast.success("Upload Successfully!");
       resetform();
     } catch (err) {

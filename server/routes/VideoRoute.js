@@ -9,11 +9,7 @@ videoroute.get("/test", (req, res) => {
   res.json({ message: "Video route is working" });
 });
 
-videoroute.post("/upload", (req, res, next) => {
-  console.log("Upload route hit");
-  console.log("Headers:", req.headers);
-  next();
-}, upload.fields([
+videoroute.post("/upload", upload.fields([
   { name: "video", maxCount: 1 },
   { name: "thumbnail", maxCount: 1 }
 ]), uploadvideo);
