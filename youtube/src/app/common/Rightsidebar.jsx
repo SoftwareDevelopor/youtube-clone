@@ -35,6 +35,7 @@ export default function Rightsidebar() {
     try {
       const res = await axios.get('https://youtube-clone-oprs.onrender.com/video/getallvideos');
       setVideo(res.data)
+      console.log(res.data)
     } catch (error) {
       console.log(error)
     }
