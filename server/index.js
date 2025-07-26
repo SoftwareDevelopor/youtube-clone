@@ -126,7 +126,7 @@ io.on("Connection", (socket) => {
 });
 
 // Serve uploads folder statically
-const uploadsPath = path.join(__dirname, "uploads");
+const uploadsPath = process.env.RENDER ? '/tmp/uploads' : path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsPath));
 
 app.use(express.json({ limit: '200mb' }));
