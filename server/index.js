@@ -126,17 +126,17 @@ io.on("Connection", (socket) => {
 });
 
 // Serve uploads folder statically
-const uploadsPath = path.join(__dirname, "uploads");
+const uploadsPath = process.env.RENDER ? path.join(__dirname, "uploads") : '/tmp/uploads' ;
 app.use("/uploads", express.static(uploadsPath));
 
+// Body parsing middleware - MUST come before routes
 app.use(express.json({ limit: '200mb' }));
 app.use(express.urlencoded({ limit: '200mb', extended: true }));
+app.use(bodyparser.json());
 
 app.get("/", (request, response) => {
   response.send("Youtube API Working !");
 });
-
-app.use(bodyparser.json());
 
 app.use("/video", videoroute);
 app.use("/api/user", userrouter);

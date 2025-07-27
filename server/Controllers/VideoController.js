@@ -87,29 +87,27 @@ exports.downloadVideo = async (req, res) => {
     const video = await Video.findById(req.params.id);
     if (!video) return res.status(404).send("Video not found");
     
-    let VideoTitle=video.videotitle;
-    let VideoFileExtension=video.filename
-    let VideoFilePath = video.filepath
-    // Set proper headers for video download
-    // Tells the browser what type of file it's receiving
-    // Ensures proper handling - browser knows it's a video file
-    // Prevents errors - without this, browser might not know how to handle the file
-    // Fallback to 'video/mp4' - if filetype is missing, defaults to MP4
-    res.setHeader('Content-Type', video.filetype || 'video/mp4');
-
-    // Set proper headers for video download
-    //Forces download - attachment tells browser to download, not play
-    // Sets filename - user gets a meaningful filename instead of random ID
-    // Preserves extension - keeps the original file extension (.mp4, .webm, etc.)
-    res.setHeader('Content-Disposition', `attachment; filename="${VideoTitle}.${path.extname(VideoFileExtension)}"`);
+    console.log('Download request for video:', video.videotitle);
+    console.log('File URL:', video.filepath);
     
-    // Stream the file
-    // Memory efficient - doesn't load entire file into memory
-    // Handles large files - videos can be several GB
-    // Faster response - starts sending data immediately
-    // Better performance - especially for large video files
-    const fileStream = fs.createReadStream(VideoFilePath);
-    fileStream.pipe(res);
+    // Set proper headers for video download
+    res.setHeader('Content-Type', video.filetype || 'video/mp4');
+    
+    // Extract filename from URL for download name
+    const filename = path.basename(video.filepath);
+    
+    res.setHeader('Content-Disposition', `attachment; filename="${video.videotitle}.${path.extname(filename)}"`);
+    
+    // Stream the file directly from the URL
+    const response = await axios({
+      method: 'GET',
+      url: video.filepath,
+      responseType: 'stream'
+    });
+    
+    // Pipe the response stream to the client
+    response.data.pipe(res);
+    
   } catch (err) {
     console.log('Error downloading video:', err);
     res.status(500).send("Error downloading video");
@@ -117,20 +115,30 @@ exports.downloadVideo = async (req, res) => {
 };
 
 exports.downloadAndSaveVideo = async (req, res) => {
-  console.log(req.body)
-  const { url, videotitle, videochannel, uploader, description, thumbnail } =
-    req.body;
-  if (
-    !url ||
-    !videotitle ||
-    !videochannel ||
-    !uploader ||
-    !description ||
-    !thumbnail
-  ) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
   try {
+    console.log('downloadAndSaveVideo called');
+    console.log('req.body:', req.body);
+    console.log('req.headers:', req.headers);
+    
+    // Check if req.body exists
+    if (!req.body) {
+      return res.status(400).json({ 
+        message: "Request body is missing. Make sure to send JSON data.",
+        error: "req.body is undefined"
+      });
+    }
+    
+    const { url, videotitle, videochannel, uploader, description, thumbnail } = req.body;
+    
+    // Validate required fields
+    if (!url || !videotitle || !videochannel || !uploader || !description || !thumbnail) {
+      return res.status(400).json({ 
+        message: "Missing required fields",
+        required: ["url", "videotitle", "videochannel", "uploader", "description", "thumbnail"],
+        received: Object.keys(req.body)
+      });
+    }
+    
     // Download video file
     const response = await axios({
       method: "GET",
@@ -195,9 +203,12 @@ exports.downloadAndSaveVideo = async (req, res) => {
         video: file,
       });
   } catch (error) {
-    console.log(error);
+    console.log('downloadAndSaveVideo error:', error);
     return res
       .status(500)
-      .json({ message: "Failed to download and save video/thumbnail" });
+      .json({ 
+        message: "Failed to download and save video/thumbnail",
+        error: error.message
+      });
   }
 };
