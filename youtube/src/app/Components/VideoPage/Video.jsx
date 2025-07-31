@@ -19,6 +19,7 @@ export default function Video() {
   let { id } = useParams();
 
   let [singledata, setSingleData] = useState(null);
+  let [pointsAwarded, setPointsAwarded] = useState(false);
 
   let {
     isSubscribed,
@@ -42,8 +43,23 @@ export default function Video() {
   };
 
   const incrementPointsForWatching = async () => {
-    if (user && user.displayName && user.email) {
+    if (user && user.displayName && user.email && singledata) {
       try {
+        // Check if user has already watched this video today
+        const videoId = singledata._id;
+        const today = new Date().toDateString();
+        const watchedKey = `watched_${user.email}_${videoId}_${today}`;
+        
+        // Check localStorage to see if this video was already watched today
+        const alreadyWatched = localStorage.getItem(watchedKey);
+        
+        if (alreadyWatched) {
+          console.log('Video already watched today, skipping points increment');
+          return;
+        }
+        
+        console.log('Incrementing points for watching video:', singledata.videotitle);
+        
         const response = await fetch("https://youtube-clone-oprs.onrender.com/api/user/addPoints", {
           method: "POST",
           headers: {
@@ -58,8 +74,21 @@ export default function Video() {
         const data = await response.json();
         if (response.ok) {
           console.log(`Points incremented by 5 for watching video. New total: ${data.points}`);
+          // Mark this video as watched today
+          localStorage.setItem(watchedKey, 'true');
+          
+          // Set points awarded state to show notification
+          setPointsAwarded(true);
+          
+          // Show success message to user
+          console.log('Points awarded for watching video!');
+          
+          // Hide notification after 3 seconds
+          setTimeout(() => {
+            setPointsAwarded(false);
+          }, 3000);
         } else {
-          console.error(data.message || "Failed to increment points for watching");
+          console.error('Failed to increment points for watching:', data.message);
         }
       } catch (error) {
         console.error("Error incrementing points for watching:", error);
@@ -348,6 +377,16 @@ export default function Video() {
 
   return (
     <div className="py-6 px-2">
+      {/* Points Awarded Notification */}
+      {pointsAwarded && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🎉</span>
+            <span className="font-semibold">+5 Points earned for watching!</span>
+          </div>
+        </div>
+      )}
+      
       <div className="grid lg:grid-cols-[55%_auto] grid-cols-1 gap-9">
         {/* Main Video Area */}
         <div className="flex flex-col gap-5">
