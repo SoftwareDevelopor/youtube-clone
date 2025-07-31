@@ -86,7 +86,7 @@ export default function Auth() {
               onClick={() => setopenmodal(openmodal === false ? true : false)}
             />
             <div
-              className={`absolute bg-[#282828] lg:right-15 left-0 top-5 rounded-xl lg:w-[400px] w-[250px] z-50 ${
+              className={`absolute bg-[#282828] lg:right-15 right-0 top-5 rounded-xl lg:w-[400px] w-[250px] z-50 ${
                 openmodal === true ? "block" : "hidden"
               }`}
             >
