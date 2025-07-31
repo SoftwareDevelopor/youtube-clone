@@ -178,7 +178,7 @@ export default function Video() {
       }
       
       // Check for email in different possible locations
-      const userEmail = user.email || user.user?.email || user.providerData?.[0]?.email;
+      const userEmail = user.email;
       
       if (!userEmail) {
         console.error('User object exists but email is missing:', user);
