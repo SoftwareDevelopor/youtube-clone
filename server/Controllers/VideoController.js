@@ -85,32 +85,81 @@ exports.incrementLike = async (req, res) => {
 exports.downloadVideo = async (req, res) => {
   try {
     const video = await Video.findById(req.params.id);
-    if (!video) return res.status(404).send("Video not found");
+    if (!video) {
+      console.log('Video not found for ID:', req.params.id);
+      return res.status(404).json({ message: "Video not found" });
+    }
     
     console.log('Download request for video:', video.videotitle);
     console.log('File URL:', video.filepath);
     
     // Set proper headers for video download
     res.setHeader('Content-Type', video.filetype || 'video/mp4');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
     // Extract filename from URL for download name
     const filename = path.basename(video.filepath);
+    const fileExtension = path.extname(filename) || '.mp4';
+    const downloadFilename = `${video.videotitle.replace(/[^a-z0-9]/gi, '_')}${fileExtension}`;
     
-    res.setHeader('Content-Disposition', `attachment; filename="${video.videotitle}.${path.extname(filename)}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${downloadFilename}"`);
     
-    // Stream the file directly from the URL
-    const response = await axios({
-      method: 'GET',
-      url: video.filepath,
-      responseType: 'stream'
-    });
-    
-    // Pipe the response stream to the client
-    response.data.pipe(res);
+    // Stream the file directly from the URL with better error handling
+    try {
+      const response = await axios({
+        method: 'GET',
+        url: video.filepath,
+        responseType: 'stream',
+        timeout: 30000, // 30 second timeout
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+      
+      // Check if response is successful
+      if (response.status !== 200) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      // Set content length if available
+      if (response.headers['content-length']) {
+        res.setHeader('Content-Length', response.headers['content-length']);
+      }
+      
+      // Pipe the response stream to the client
+      response.data.pipe(res);
+      
+      // Handle stream errors
+      response.data.on('error', (error) => {
+        console.error('Stream error:', error);
+        if (!res.headersSent) {
+          res.status(500).json({ message: "Error streaming video" });
+        }
+      });
+      
+    } catch (streamError) {
+      console.error('Error streaming video:', streamError);
+      
+      // Fallback: try to send the video URL directly
+      if (!res.headersSent) {
+        res.status(200).json({ 
+          message: "Video streaming failed, using direct URL",
+          videoUrl: video.filepath,
+          filename: downloadFilename
+        });
+      }
+    }
     
   } catch (err) {
-    console.log('Error downloading video:', err);
-    res.status(500).send("Error downloading video");
+    console.error('Error downloading video:', err);
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        message: "Error downloading video",
+        error: err.message 
+      });
+    }
   }
 };
 

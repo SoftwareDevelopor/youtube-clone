@@ -154,6 +154,13 @@ export default function Video() {
         alert('Video data not loaded. Please refresh the page and try again.');
         return;
       }
+      
+      if (!user || !user.email) {
+        alert('You must be logged in to download videos.');
+        return;
+      }
+
+      console.log('Starting download process for video:', singledata.videotitle);
 
       // Check if user has free download or premium access
       let canDownload = false;
@@ -165,8 +172,8 @@ export default function Video() {
         });
         
         if (freeRes && freeRes.data) {
-          canDownload = freeRes.data.free;
-          isPremium = freeRes.data.isPremium;
+          canDownload = freeRes.data.free || false;
+          isPremium = freeRes.data.isPremium || false;
         }
       } catch (error) {
         console.error('Error checking download status:', error);
@@ -227,6 +234,7 @@ export default function Video() {
             } catch (error) {
               console.error('Error activating premium plan:', error);
               // Still proceed with download
+              await doDownload();
             }
           },
           prefill: {
@@ -243,7 +251,8 @@ export default function Video() {
       
     } catch (error) {
       console.error('Download check failed:', error);
-      alert('Error checking download status. Please try again.');
+      // Don't show alert for general errors, just log them
+      console.log('Download process encountered an error, but continuing...');
     }
   }
 
@@ -317,7 +326,9 @@ export default function Video() {
       }
       
       if (!downloadSuccess) {
-        throw new Error('All download methods failed');
+        // Show a more user-friendly error message
+        alert('Download failed. The video might be temporarily unavailable. Please try again later.');
+        return;
       }
       
       // Save to downloads in context
@@ -350,10 +361,12 @@ export default function Video() {
         // Don't show error to user for this
       }
       
-      alert('Video downloaded successfully!');
+      // Show success message
+      console.log('Video downloaded successfully!');
       
     } catch (error) {
       console.error('Download failed:', error);
+      // Show a more user-friendly error message
       alert('Download failed. Please try again later or contact support if the problem persists.');
     }
   }
