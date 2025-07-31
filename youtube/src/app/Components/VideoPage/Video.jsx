@@ -148,6 +148,20 @@ export default function Video() {
     }
   };
 
+  // Debug function to check user state
+  const debugUserState = () => {
+    console.log('=== DEBUG USER STATE ===');
+    console.log('User object:', user);
+    console.log('User type:', typeof user);
+    console.log('User keys:', user ? Object.keys(user) : 'No user object');
+    console.log('User email:', user?.email);
+    console.log('User displayName:', user?.displayName);
+    console.log('User uid:', user?.uid);
+    console.log('User photoURL:', user?.photoURL);
+    console.log('User providerData:', user?.providerData);
+    console.log('=======================');
+  };
+
   let handleDownload = async () => {
     try {
       if (!singledata) {
@@ -155,34 +169,54 @@ export default function Video() {
         return;
       }
       
-      if (!user || !user.email) {
-        alert('You must be logged in to download videos.');
+      // Debug user state
+      debugUserState();
+      
+      if (!user) {
+        alert('You must be logged in to download videos. Please log in and try again.');
+        return;
+      }
+      
+      // Check for email in different possible locations
+      const userEmail = user.email || user.user?.email || user.providerData?.[0]?.email;
+      
+      if (!userEmail) {
+        console.error('User object exists but email is missing:', user);
+        console.log('Available user properties:', Object.keys(user));
+        alert('User authentication error. Please log out and log in again.');
         return;
       }
 
       console.log('Starting download process for video:', singledata.videotitle);
+      console.log('User authenticated with email:', userEmail);
 
       // Check if user has free download or premium access
       let canDownload = false;
       let isPremium = false;
       
       try {
+        console.log('Checking download status for user:', userEmail);
         const freeRes = await axiosInstance.post('/api/user/hasFreeDownloadToday', { 
-          email: user.email 
+          email: userEmail 
         });
+        
+        console.log('Download status response:', freeRes.data);
         
         if (freeRes && freeRes.data) {
           canDownload = freeRes.data.free || false;
           isPremium = freeRes.data.isPremium || false;
+          console.log('Download check result:', { canDownload, isPremium });
         }
       } catch (error) {
         console.error('Error checking download status:', error);
         // If we can't check, allow download anyway
         canDownload = true;
+        console.log('Allowing download due to check failure');
       }
 
       // If user has premium or free download, proceed
       if (canDownload || isPremium) {
+        console.log('Proceeding with download - user has access');
         await doDownload();
         return;
       }
@@ -218,7 +252,7 @@ export default function Video() {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  email: user.email,
+                  email: userEmail,
                   duration: 30,
                 }),
               });
@@ -238,7 +272,7 @@ export default function Video() {
             }
           },
           prefill: {
-            email: user.email,
+            email: userEmail,
           },
           theme: {
             color: '#3399cc'
@@ -346,7 +380,7 @@ export default function Video() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: user.email,
+            email: userEmail,
             videoId: singledata._id
           })
         });
