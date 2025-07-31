@@ -63,36 +63,26 @@ exports.hasFreeDownloadToday = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
-      console.log('hasFreeDownloadToday: email is required');
       return res.status(400).json({ message: 'email is required.', free: false, isPremium: false });
     }
-    
-    console.log('hasFreeDownloadToday: checking for email:', email);
-    
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('hasFreeDownloadToday: user not found for email:', email);
       return res.status(404).json({ message: 'User not found.', free: false, isPremium: false });
     }
-    
-    console.log('hasFreeDownloadToday: found user, checking premium status');
-    
     // Check if premium has expired
     if (user.isPremium && user.premiumExpiry && new Date() > user.premiumExpiry) {
-      console.log('hasFreeDownloadToday: premium expired for user:', email);
       user.isPremium = false;
       user.premiumExpiry = null;
       await user.save();
     }
-    
     // Premium users get unlimited downloads
     if (user.isPremium) {
       console.log('hasFreeDownloadToday: user is premium, allowing download');
       return res.json({ free: true, isPremium: true });
     }
-    
-    console.log('hasFreeDownloadToday: user is not premium, checking daily downloads');
-    
+    else{
+      console.log('hasFreeDownloadToday: user is not premium, checking daily downloads');
+    }
     // Free users get 1 download per day
     const today = new Date();
     today.setHours(0,0,0,0);

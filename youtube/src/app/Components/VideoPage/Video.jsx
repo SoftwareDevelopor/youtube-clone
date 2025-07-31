@@ -154,13 +154,6 @@ export default function Video() {
         alert('Video data not loaded. Please refresh the page and try again.');
         return;
       }
-      
-      if (!user || !user.email) {
-        alert('You must be logged in to download videos.');
-        return;
-      }
-
-      console.log('Starting download process for video:', singledata.videotitle);
 
       // Check if user has free download or premium access
       let canDownload = false;
@@ -172,8 +165,8 @@ export default function Video() {
         });
         
         if (freeRes && freeRes.data) {
-          canDownload = freeRes.data.free || false;
-          isPremium = freeRes.data.isPremium || false;
+          canDownload = freeRes.data.free;
+          isPremium = freeRes.data.isPremium;
         }
       } catch (error) {
         console.error('Error checking download status:', error);
@@ -234,7 +227,6 @@ export default function Video() {
             } catch (error) {
               console.error('Error activating premium plan:', error);
               // Still proceed with download
-              await doDownload();
             }
           },
           prefill: {
