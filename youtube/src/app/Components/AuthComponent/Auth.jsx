@@ -78,7 +78,7 @@ export default function Auth() {
           <div className="w-10 h-10 flex items-center justify-center">
             <MdNotificationsNone className="text-white text-4xl" />
           </div>
-          <div className="w-12 h-12 rounded-full lg:flex items-center justify-center relative hidden">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center relative">
             <img
               src={user.photoURL}
               alt=""
