@@ -7,120 +7,121 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function Login() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    name: ''
-  });
+//   const [isLogin, setIsLogin] = useState(true);
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+//   const [loading, setLoading] = useState(false);
+//   const [formData, setFormData] = useState({
+//     email: '',
+//     password: '',
+//     confirmPassword: '',
+//     name: ''
+//   });
 
-  const auth = getAuth(app);
-  const googleProvider = new GoogleAuthProvider();
+//   const auth = getAuth(app);
+//   const googleProvider = new GoogleAuthProvider();
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+//   const handleInputChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData(prev => ({
+//       ...prev,
+//       [name]: value
+//     }));
+//   };
 
-  const validateForm = () => {
-    if (!formData.email || !formData.password) {
-      toast.error('Please fill in all required fields');
-      return false;
-    }
+//   const validateForm = () => {
+//     if (!formData.email || !formData.password) {
+//       toast.error('Please fill in all required fields');
+//       return false;
+//     }
 
-    if (!isLogin) {
-      if (!formData.name) {
-        toast.error('Please enter your name');
-        return false;
-      }
-      if (formData.password !== formData.confirmPassword) {
-        toast.error('Passwords do not match');
-        return false;
-      }
-      if (formData.password.length < 6) {
-        toast.error('Password must be at least 6 characters long');
-        return false;
-      }
-    }
+//     if (!isLogin) {
+//       if (!formData.name) {
+//         toast.error('Please enter your name');
+//         return false;
+//       }
+//       if (formData.password !== formData.confirmPassword) {
+//         toast.error('Passwords do not match');
+//         return false;
+//       }
+//       if (formData.password.length < 6) {
+//         toast.error('Password must be at least 6 characters long');
+//         return false;
+//       }
+//     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error('Please enter a valid email address');
-      return false;
-    }
+//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     if (!emailRegex.test(formData.email)) {
+//       toast.error('Please enter a valid email address');
+//       return false;
+//     }
 
-    return true;
-  };
+//     return true;
+//   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
     
-    if (!validateForm()) return;
+//     if (!validateForm()) return;
 
-    setLoading(true);
-    try {
-      if (isLogin) {
-        await signInWithEmailAndPassword(auth, formData.email, formData.password);
-        toast.success('Successfully logged in!');
-      } else {
-        await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        toast.success('Account created successfully!');
-      }
-    } catch (error) {
-      let errorMessage = 'An error occurred';
-      switch (error.code) {
-        case 'auth/user-not-found':
-          errorMessage = 'No account found with this email';
-          break;
-        case 'auth/wrong-password':
-          errorMessage = 'Incorrect password';
-          break;
-        case 'auth/email-already-in-use':
-          errorMessage = 'An account with this email already exists';
-          break;
-        case 'auth/weak-password':
-          errorMessage = 'Password is too weak';
-          break;
-        case 'auth/invalid-email':
-          errorMessage = 'Invalid email address';
-          break;
-        default:
-          errorMessage = error.message;
-      }
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
+//     setLoading(true);
+//     try {
+//       if (isLogin) {
+//         await signInWithEmailAndPassword(auth, formData.email, formData.password);
+//         toast.success('Successfully logged in!');
+//       } else {
+//         await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+//         toast.success('Account created successfully!');
+//       }
+//     } catch (error) {
+//       let errorMessage = 'An error occurred';
+//       switch (error.code) {
+//         case 'auth/user-not-found':
+//           errorMessage = 'No account found with this email';
+//           break;
+//         case 'auth/wrong-password':
+//           errorMessage = 'Incorrect password';
+//           break;
+//         case 'auth/email-already-in-use':
+//           errorMessage = 'An account with this email already exists';
+//           break;
+//         case 'auth/weak-password':
+//           errorMessage = 'Password is too weak';
+//           break;
+//         case 'auth/invalid-email':
+//           errorMessage = 'Invalid email address';
+//           break;
+//         default:
+//           errorMessage = error.message;
+//       }
+//       toast.error(errorMessage);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    try {
-      await signInWithPopup(auth, googleProvider);
-      toast.success('Successfully signed in with Google!');
-    } catch (error) {
-      toast.error('Failed to sign in with Google');
-    } finally {
-      setLoading(false);
-    }
-  };
+//   const handleGoogleSignIn = async () => {
+//     setLoading(true);
+//     try {
+//       await signInWithPopup(auth, googleProvider);
+//       toast.success('Successfully signed in with Google!');
+//     } catch (error) {
+//       toast.error('Failed to sign in with Google');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-  const toggleForm = () => {
-    setIsLogin(!isLogin);
-    setFormData({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      name: ''
-    });
-  };
+//   const toggleForm = () => {
+//     setIsLogin(!isLogin);
+//     setFormData({
+//       email: '',
+//       password: '',
+//       confirmPassword: '',
+//       name: ''
+//     });
+//   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-4">
@@ -133,16 +134,36 @@ export default function Login() {
             <FaYoutube className="text-red-600 text-4xl mr-2" />
             <h1 className="text-3xl font-bold text-gray-800">YouTube</h1>
           </div>
-          <h2 className="text-2xl font-semibold text-gray-700">
+          {/* <h2 className="text-2xl font-semibold text-gray-700">
             {isLogin ? 'Sign In' : 'Create Account'}
           </h2>
           <p className="text-gray-500 mt-2">
             {isLogin ? 'Welcome back! Please sign in to your account.' : 'Join YouTube to share and discover amazing videos.'}
-          </p>
+          </p> */}
         </div>
 
+            <form action="" >
+              <div className="">
+                <label htmlFor="">Name</label>
+                <input type="text" name="" id="" className='w-full border'/>
+              </div>
+              <div className="">
+                <label htmlFor="">email</label>
+                <input type="email" name="" id="" className='w-full border'/>
+              </div>
+              <div className="">
+                <label htmlFor="">password</label>
+                <input type="password" name="" id="" className='w-full border' />
+              </div>
+              <div className="">
+                <label htmlFor="">phone number</label>
+                <input type="tel" name="" id="" className='w-full border'/>
+              </div>
+              
+            </form>
+
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* <form onSubmit={handleSubmit} className="space-y-6">
           {!isLogin && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -153,7 +174,7 @@ export default function Login() {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
                 placeholder="Enter your full name"
                 required
               />
@@ -169,7 +190,7 @@ export default function Login() {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
               placeholder="Enter your email"
               required
             />
@@ -185,7 +206,7 @@ export default function Login() {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 pr-12"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 pr-12"
                 placeholder="Enter your password"
                 required
               />
@@ -210,7 +231,7 @@ export default function Login() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 pr-12"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 pr-12"
                   placeholder="Confirm your password"
                   required
                 />
@@ -239,7 +260,7 @@ export default function Login() {
               isLogin ? 'Sign In' : 'Create Account'
             )}
           </button>
-        </form>
+        </form> */}
 
         {/* Divider */}
         <div className="my-6 flex items-center">
@@ -248,7 +269,7 @@ export default function Login() {
           <div className="flex-1 border-t border-gray-300"></div>
         </div>
 
-        {/* Google Sign In */}
+{/*         
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
@@ -258,7 +279,7 @@ export default function Login() {
           Continue with Google
         </button>
 
-        {/* Toggle Form */}
+        
         <div className="text-center mt-6">
           <p className="text-gray-600">
             {isLogin ? "Don't have an account?" : "Already have an account?"}
@@ -271,14 +292,14 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Terms and Privacy */}
+        
         {!isLogin && (
           <p className="text-xs text-gray-500 text-center mt-4">
             By creating an account, you agree to YouTube's{' '}
             <a href="#" className="text-red-600 hover:underline">Terms of Service</a> and{' '}
             <a href="#" className="text-red-600 hover:underline">Privacy Policy</a>
           </p>
-        )}
+        )} */}
       </div>
     </div>
   );

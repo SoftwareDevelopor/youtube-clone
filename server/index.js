@@ -15,6 +15,7 @@ const socketio = require("socket.io");
 
 
 const Recording = require("./Models/Recording.js"); // Fixed casing to match file system
+const userdataroute = require("./routes/userdataroute.js");
 
 
 
@@ -140,7 +141,7 @@ app.get("/", (request, response) => {
 
 app.use("/video", videoroute);
 app.use("/api/user", userrouter);
-
+app.use("/user/userdata",userdataroute)
 server.listen(5000,()=>{
   console.log('Server is running !')
 })
