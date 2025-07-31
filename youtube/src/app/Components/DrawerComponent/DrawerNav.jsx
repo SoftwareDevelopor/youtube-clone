@@ -11,11 +11,19 @@ export default function DrawerNav({opennavitems,setopennav}) {
     
   return (
     <>
+      {/* Backdrop overlay for mobile */}
+      {opennavitems === 1 && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
+          onClick={() => setopennav(0)}
+        />
+      )}
+      
       <aside
         id="separator-sidebar"
-        className={`w-[260px] h-screen fixed top-0 left-0 transition-transform -translate-x-full sm:translate-x-0 ${
-          opennavitems == 1 ? "block" : "hidden"
-        }`}
+        className={`w-[260px] h-screen fixed top-0 left-0 z-50 transition-transform duration-300 ease-in-out ${
+          opennavitems === 1 ? "translate-x-0" : "-translate-x-full"
+        } sm:translate-x-0`}
         aria-label="Sidebar"
       >
         <div className="flex items-center gap-7 bg-black px-5">
