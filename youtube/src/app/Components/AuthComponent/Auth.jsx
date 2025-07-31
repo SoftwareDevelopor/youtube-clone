@@ -19,32 +19,6 @@ export default function Auth() {
 
   let [visible,setvisible]=useState(false)
 
-  let googlelogin = () => {
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        settoken(token);
-        setuser(user);
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      });
-  };
   return (
     <div className="flex items-center gap-3">
       {user ? (
@@ -215,6 +189,7 @@ export default function Auth() {
           <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
             <BsThreeDotsVertical className="text-2xl text-gray-700 dark:text-gray-300" />
           </button>
+          <Link href={'/youtubechannelpage'}>
           <button
             onClick={googlelogin}
             type="button"
@@ -223,6 +198,7 @@ export default function Auth() {
             <HiOutlineUserCircle className="text-xl" />
             <span className="font-semibold">Sign In</span>
           </button>
+          </Link>
         </>
       )}
     </div>

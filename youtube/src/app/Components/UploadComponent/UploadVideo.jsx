@@ -102,7 +102,7 @@ export default function UploadVideo() {
         
         <div className='mb-2'>
           <label className='block font-medium mb-1'>Channel:</label>
-          <div className='p-2 bg-gray-100 text-black rounded'>{user?.displayName || user?.email || 'Unknown Channel'}</div>
+          <div className='p-2 bg-gray-100 text-black rounded'>{user?.displayName || 'Unknown Channel'}</div>
         </div>
         <div className='mb-2'>
           <label htmlFor="video-upload" className='block font-medium mb-1'>Video File:</label>
@@ -115,7 +115,7 @@ export default function UploadVideo() {
         </div>
         {preview && (
           <div className='mb-2'>
-            <video width="320" height="180" controls>
+            <video width="320" height="180" controls controlsList="nodownload">
               <source src={preview} type={videoFile ? videoFile.type : ''} />
               
             </video>

@@ -177,19 +177,7 @@ export default function Video() {
         return;
       }
       
-      // Check for email in different possible locations
-      const userEmail = user.email;
-      
-      if (!userEmail) {
-        console.error('User object exists but email is missing:', user);
-        console.log('Available user properties:', Object.keys(user));
-        alert('User authentication error. Please log out and log in again.');
-        return;
-      }
-
-      console.log('Starting download process for video:', singledata.videotitle);
-      console.log('User authenticated with email:', userEmail);
-
+    
       // Check if user has free download or premium access
       let canDownload = false;
       let isPremium = false;
