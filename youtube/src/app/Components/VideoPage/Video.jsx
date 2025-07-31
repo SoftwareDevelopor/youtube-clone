@@ -121,41 +121,50 @@ export default function Video() {
 
   let handleDownload = async () => {
     try {
-      if (!singledata) return alert('Video data not loaded');
-      if (!user || !user.email) return alert('You must be logged in to download.');
-
-      // 1. Check if user has a free download today
-      let freeRes;
-      try {
-        freeRes = await axiosInstance.post('/api/user/hasFreeDownloadToday', { email: user.email });
-      } catch (axiosError) {
-        console.error('Axios request failed, trying fetch:', axiosError);
-        // Fallback to fetch
-        const fetchRes = await fetch('https://youtube-clone-oprs.onrender.com/api/user/hasFreeDownloadToday', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: user.email }),
-        });
-        freeRes = { data: await fetchRes.json() };
-      }
-      
-      // Add proper error handling and default values
-      if (!freeRes || !freeRes.data) {
-        console.error('Invalid response from hasFreeDownloadToday');
-        alert('Error checking download status. Please try again.');
+      if (!singledata) {
+        alert('Video data not loaded. Please refresh the page and try again.');
         return;
       }
       
-      const isFree = freeRes.data.free || false; // Default to false if undefined
-      const isPremium = freeRes.data.isPremium || false; // Default to false if undefined
-      
-      console.log('Download check result:', { isFree, isPremium });
+      if (!user || !user.email) {
+        alert('You must be logged in to download videos.');
+        return;
+      }
 
-      // 2. If not free, trigger Razorpay payment
-      if (!isFree) {
-        // Load Razorpay script if not already loaded
+      console.log('Starting download process for video:', singledata.videotitle);
+
+      // Check if user has free download or premium access
+      let canDownload = false;
+      let isPremium = false;
+      
+      try {
+        const freeRes = await axiosInstance.post('/api/user/hasFreeDownloadToday', { 
+          email: user.email 
+        });
+        
+        if (freeRes && freeRes.data) {
+          canDownload = freeRes.data.free || false;
+          isPremium = freeRes.data.isPremium || false;
+        }
+      } catch (error) {
+        console.error('Error checking download status:', error);
+        // If we can't check, allow download anyway
+        canDownload = true;
+      }
+
+      // If user has premium or free download, proceed
+      if (canDownload || isPremium) {
+        await doDownload();
+        return;
+      }
+
+      // If no free download and not premium, show payment option
+      const shouldPay = confirm(
+        'You have used your free download today. Would you like to get premium access for unlimited downloads?'
+      );
+      
+      if (shouldPay) {
+        // Load Razorpay script
         if (!window.Razorpay) {
           await new Promise((resolve) => {
             const script = document.createElement('script');
@@ -164,15 +173,14 @@ export default function Video() {
             document.body.appendChild(script);
           });
         }
-        // Create order on backend (optional, for now use fixed amount)
+
         const options = {
-          key: 'rzp_test_1DP5mmOlF5G5ag', // Replace with your test key if needed
+          key: 'rzp_test_1DP5mmOlF5G5ag',
           amount: 10000, // 100 INR in paise
           currency: 'INR',
           name: 'Video Download Premium',
           description: 'Premium Plan - Unlimited Downloads for 30 Days',
           handler: async function (response) {
-            // On payment success, activate premium plan and proceed with download
             try {
               // Activate premium plan
               const premiumResponse = await fetch("https://youtube-clone-oprs.onrender.com/api/user/activatePremium", {
@@ -182,12 +190,11 @@ export default function Video() {
                 },
                 body: JSON.stringify({
                   email: user.email,
-                  duration: 30, // 30 days premium
+                  duration: 30,
                 }),
               });
               
               if (premiumResponse.ok) {
-                console.log('Premium plan activated successfully');
                 alert('Premium plan activated! You now have unlimited downloads for 30 days.');
               } else {
                 console.error('Failed to activate premium plan');
@@ -197,8 +204,8 @@ export default function Video() {
               await doDownload();
             } catch (error) {
               console.error('Error activating premium plan:', error);
-              // Still proceed with download even if premium activation fails
-            await doDownload();
+              // Still proceed with download
+              await doDownload();
             }
           },
           prefill: {
@@ -208,12 +215,11 @@ export default function Video() {
             color: '#3399cc'
           }
         };
+        
         const rzp = new window.Razorpay(options);
         rzp.open();
-        return;
       }
-      // 3. If free, proceed with download
-      await doDownload();
+      
     } catch (error) {
       console.error('Download check failed:', error);
       alert('Error checking download status. Please try again.');
@@ -225,40 +231,84 @@ export default function Video() {
       console.log('Starting download for video:', singledata.videotitle);
       console.log('Video ID:', singledata._id);
       
-    // Fetch the file as a blob from the download endpoint
-      const response = await axios.get(`https://youtube-clone-oprs.onrender.com/video/download/${singledata._id}`, {
-      responseType: 'blob',
-    });
+      // Try multiple download methods
+      let downloadSuccess = false;
       
-      console.log('Download response received, size:', response.data.size);
+      // Method 1: Try the API endpoint
+      try {
+        const response = await axios.get(`https://youtube-clone-oprs.onrender.com/video/download/${singledata._id}`, {
+          responseType: 'blob',
+          timeout: 30000, // 30 second timeout
+        });
+        
+        if (response.data && response.data.size > 0) {
+          console.log('Download response received, size:', response.data.size);
+          
+          // Create a link and trigger download
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          
+          // Set filename with proper extension
+          const fileExtension = singledata.filetype ? '.' + singledata.filetype.split('/')[1] : '.mp4';
+          const filename = singledata.videotitle.replace(/[^a-z0-9]/gi, '_') + fileExtension;
+          link.setAttribute('download', filename);
+          
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+          
+          downloadSuccess = true;
+          console.log('Download completed successfully via API');
+        }
+      } catch (apiError) {
+        console.error('API download failed:', apiError);
+      }
       
-    // Create a link and trigger download
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
+      // Method 2: Fallback to direct video URL if API fails
+      if (!downloadSuccess && singledata.filepath) {
+        try {
+          console.log('Trying fallback download method...');
+          
+          const response = await fetch(singledata.filepath);
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            
+            const fileExtension = singledata.filetype ? '.' + singledata.filetype.split('/')[1] : '.mp4';
+            const filename = singledata.videotitle.replace(/[^a-z0-9]/gi, '_') + fileExtension;
+            link.setAttribute('download', filename);
+            
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            
+            downloadSuccess = true;
+            console.log('Download completed successfully via fallback method');
+          }
+        } catch (fallbackError) {
+          console.error('Fallback download failed:', fallbackError);
+        }
+      }
       
-      // Set filename with proper extension
-      const fileExtension = singledata.filetype ? '.' + singledata.filetype.split('/')[1] : '.mp4';
-      const filename = singledata.videotitle.replace(/[^a-z0-9]/gi, '_') + fileExtension;
-      link.setAttribute('download', filename);
+      if (!downloadSuccess) {
+        throw new Error('All download methods failed');
+      }
       
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
-      
-      console.log('Download completed successfully');
-      
-    // Save to downloads in context
-    setDownloads(prev => {
-      // Avoid duplicates by _id
+      // Save to downloads in context
+      setDownloads(prev => {
+        // Avoid duplicates by _id
         if (prev.some(v => v._id == singledata._id)) return prev;
-      return [...prev, singledata];
-    });
+        return [...prev, singledata];
+      });
       
-    // Record download in backend
-    try {
-        const recordResponse = await fetch(`https://youtube-clone-oprs.onrender.com/api/user/recordDownload`,{
+      // Record download in backend (don't block on this)
+      try {
+        const recordResponse = await fetch(`https://youtube-clone-oprs.onrender.com/api/user/recordDownload`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -274,15 +324,16 @@ export default function Video() {
         } else {
           console.error('Failed to record download');
         }
-    } catch (err) {
+      } catch (err) {
         console.error('Error recording download:', err);
+        // Don't show error to user for this
       }
       
       alert('Video downloaded successfully!');
       
     } catch (error) {
       console.error('Download failed:', error);
-      alert('Download failed. Please try again.');
+      alert('Download failed. Please try again later or contact support if the problem persists.');
     }
   }
 
