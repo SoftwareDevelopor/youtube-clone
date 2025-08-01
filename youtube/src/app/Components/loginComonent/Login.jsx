@@ -146,10 +146,10 @@ let handleregister=async()=>{
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <ToastContainer position="top-right" />
       
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+      <div className="max-w-md w-full rounded-2xl shadow-2xl p-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
