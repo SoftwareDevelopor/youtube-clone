@@ -142,7 +142,17 @@ let handleregister=async()=>{
     method:'POST',
     body:userformdata
   })
-}
+  if (!userauthdata.ok) {
+    const errorData = await userauthdata.json();
+    console.log('Error response:', errorData);
+    
+  }
+  
+  const data = await userauthdata.json();
+  toast.success("Upload Successfully!");
+  
+} 
+
 
 
   return (
