@@ -1,12 +1,21 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { app } from '../../FirebaseConfig';
 import { FaGoogle, FaEye, FaEyeSlash, FaYoutube } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import axiosInstance from '../axioscomponent/axiosinstances';
+import { MainContextProvider } from '@/app/MainContext';
 
 export default function Login() {
+
+  let {user}=useContext(MainContextProvider)
+  let [name,setname]=useState('')
+  let [email,setemail]=useState('')
+  let [password,setpassword]=useState('')
+  let [phonenumber,setphonenumber]=useState(null)
 //   const [isLogin, setIsLogin] = useState(true);
 //   const [showPassword, setShowPassword] = useState(false);
 //   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -122,6 +131,19 @@ export default function Login() {
 //     });
 //   };
 
+let userformdata=new FormData()
+userformdata.append("name",name)
+userformdata.append("email",email)
+userformdata.append("password",password)
+userformdata.append("phonenumber",phonenumber)
+
+let handleregister=async()=>{
+  const userauthdata=await fetch('https://youtube-clone-oprs.onrender.com/user/userdata/getuserdata', {
+    method:'POST',
+    body:userformdata
+  })
+}
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-4">
@@ -142,24 +164,24 @@ export default function Login() {
           </p> */}
         </div>
 
-            <form action="" >
+            <form action="" onSubmit={handleregister} >
               <div className="">
                 <label htmlFor="">Name</label>
-                <input type="text" name="" id="" className='w-full border'/>
+                <input type="text" name="" id="username" onChange={(event)=>setname(event.target.value)} className='w-full border'/>
               </div>
               <div className="">
                 <label htmlFor="">email</label>
-                <input type="email" name="" id="" className='w-full border'/>
+                <input type="email" name="" id="useremail" onChange={(event)=>setname(event.target.value)} className='w-full border'/>
               </div>
               <div className="">
                 <label htmlFor="">password</label>
-                <input type="password" name="" id="" className='w-full border' />
+                <input type="password" name="" id="userpassword" onChange={(event)=>setname(event.target.value)} className='w-full border' />
               </div>
               <div className="">
                 <label htmlFor="">phone number</label>
-                <input type="tel" name="" id="" className='w-full border'/>
+                <input type="tel" name="" id="userphonenumber" onChange={(event)=>setname(event.target.value)} className='w-full border'/>
               </div>
-              
+              <button type="button" className='border'>submit</button>
             </form>
 
         {/* Form */}
